@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Swift on 落叶</title>
+    <link>http://caisanze.com/tags/swift/</link>
+    <description>Recent content in Swift on 落叶</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 31 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://caisanze.com/tags/swift/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>SZAVPlayer</title>
+      <link>http://caisanze.com/post/swift-avplayer/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/swift-avplayer/</guid>
+      <description>前言 在iOS系统里实现音视频播放有很多种方式，这里贴一下苹果WWDC上的一个架构图： 图里很清晰的讲述了各个库之间的依赖关系。AudioToo</description>
+    </item>
+    
+  </channel>
+</rss>
