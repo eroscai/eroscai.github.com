@@ -17,7 +17,7 @@
       <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>http://caisanze.com/post/swift-avplayer/</guid>
-      <description>前言 在iOS系统里实现音视频播放有很多种方式，这里贴一下苹果WWDC上的一个架构图： 图里很清晰的讲述了各个库之间的依赖关系。AudioToo</description>
+      <description>前言 最近正好在开发音频播放功能，所以基于AVPlayer实现了SZAVPlayer这个库，完整实现了音频播放功能，同时实现了缓存。在实现缓存</description>
     </item>
     
   </channel>

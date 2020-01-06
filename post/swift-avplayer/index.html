@@ -175,9 +175,13 @@
                             AVAssetResourceLoaderDelegate
                         </a>
                         
+                        <a class="tag" href="/tags/avplayeritemvideooutput" title="AVPlayerItemVideoOutput">
+                            AVPlayerItemVideoOutput
+                        </a>
+                        
                     </div>
                     <h1>SZAVPlayer</h1>
-                    <h2 class="subheading">基于AVPlayer实现音视频播放和缓存</h2>
+                    <h2 class="subheading">基于AVPlayer实现音视频播放和缓存，支持视频画面的同步输出</h2>
                     <span class="meta">
                         2019-12-31
                         
@@ -215,10 +219,11 @@
 <li><a href="#需要理解的几个类">需要理解的几个类</a></li>
 <li><a href="#音视频初始化过程">音视频初始化过程</a></li>
 <li><a href="#音视频切换过程">音视频切换过程</a></li>
+<li><a href="#捕获视频画面的输出-比如想要同时绘制到多个view上时">捕获视频画面的输出（比如想要同时绘制到多个View上时）</a></li>
 </ul></li>
 <li><a href="#avplayer缓存原理及问题整理">AVPlayer缓存原理及问题整理</a>
 <ul>
-<li><a href="#缓存遇到的问题整理">缓存遇到的问题整理</a>
+<li><a href="#问题整理">问题整理</a>
 <ul>
 <li><a href="#avasset的异步加载">AVAsset的异步加载</a></li>
 <li><a href="#avassetresourceloaderdelegate设置">AVAssetResourceLoaderDelegate设置</a></li>
@@ -238,6 +243,8 @@
                 
 
 <h1 id="前言">前言</h1>
+
+<p>最近正好在开发音频播放功能，所以基于AVPlayer实现了<a href="https://github.com/eroscai/SZAVPlayer">SZAVPlayer</a>这个库，完整实现了音频播放功能，同时实现了缓存。在实现缓存的时候遇到了不少坑，所以找个地方记录一下。</p>
 
 <p>在iOS系统里实现音视频播放有很多种方式，这里贴一下苹果WWDC上的一个架构图：
 <img src="/images/swift-avplayer.jpg" alt="iOS音视频架构图" /></p>
@@ -273,8 +280,8 @@
 <ol>
 <li>使用URL初始化AVURLAsset，并提前进行异步加载，下方的“问题整理”部分有更细致的说明。</li>
 <li>使用上一步初始化好的Asset创建AVPlayerItem，配置好需要的各类属性。</li>
-<li>添加各类监听。</li>
-</ol>
+
+<li><p>添加各类监听。</p>
 
 <blockquote>
 <p>AVPlayer监听（player.addPeriodicTimeObserver）</p>
@@ -282,12 +289,13 @@
 <p>AVPlayerItem监听（status / loadedTimeRanges / playbackBufferEmpty / playbackLikelyToKeepUp等）</p>
 
 <p>NotificationCenter监听（AVPlayerItemDidPlayToEndTime / AVPlayerItemPlaybackStalled等）。</p>
-</blockquote>
+</blockquote></li>
 
-<ol>
-<li>如果是视频播放就创建AVPlayerLayer，如果是音频播放可跳过此步。</li>
-<li>等待状态变化的通知。在第2步添加好监听的话可以接收到readyToPlay的变化通知，此时可以调用AVPlayer的play和pause方法控制播放和暂停。</li>
-<li>播放过程中可能会出现缓冲开始、缓冲结束、播放挂起（playbackStalled）等变化，需要正确识别并处理。</li>
+<li><p>如果是视频播放就创建AVPlayerLayer，如果是音频播放可跳过此步。</p></li>
+
+<li><p>等待状态变化的通知。在第2步添加好监听的话可以接收到readyToPlay的变化通知，此时可以调用AVPlayer的play和pause方法控制播放和暂停。</p></li>
+
+<li><p>播放过程中可能会出现缓冲开始、缓冲结束、播放挂起（playbackStalled）等变化，需要正确识别并处理。</p></li>
 </ol>
 
 <blockquote>
@@ -335,9 +343,75 @@
 <li><p>等待状态变化的通知，并开始正常使用。</p></li>
 </ol>
 
-<h1 id="avplayer缓存原理及问题整理">AVPlayer缓存原理及问题整理</h1>
+<h2 id="捕获视频画面的输出-比如想要同时绘制到多个view上时">捕获视频画面的输出（比如想要同时绘制到多个View上时）</h2>
 
-<p>最近正好在开发音频播放功能，所以基于AVPlayer实现了<a href="https://github.com/eroscai/SZAVPlayer">SZAVPlayer</a>这个库，完整实现了音频播放功能，同时实现了缓存。在实现缓存的时候遇到了不少坑，接下来着重讲一下相关问题。</p>
+<ol>
+<li><p>创建<code>AVPlayerItemVideoOutput</code>，设定输出的相关参数。</p>
+
+<pre><code class="language-swift">private let videoOutputQueue: DispatchQueue = DispatchQueue(label: &quot;com.SZAVPlayer.videoOutput&quot;)
+    
+let settings: [String: Any] = [String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: kCVPixelFormatType_32BGRA)]
+let videoOutput = AVPlayerItemVideoOutput(outputSettings: settings)
+videoOutput.setDelegate(self, queue: videoOutputQueue)
+</code></pre></li>
+
+<li><p>创建<code>CADisplayLink</code>，用来后续实时的捕获视频画面。</p>
+
+<pre><code class="language-swift">let link = CADisplayLink(target: self, selector: #selector(handleDisplayLinkCallback))
+link.add(to: RunLoop.current, forMode: .default)
+// 需要先暂停，在确定到视频已开始播放以后再取消暂停
+link.isPaused = true
+</code></pre></li>
+
+<li><p><code>AVPlayerItem</code>创建好以后使用<code>add(_ output: AVPlayerItemOutput)</code>方法添加output到playerItem上。</p></li>
+
+<li><p>调用play方法播放之前需要调用一下<code>requestNotificationOfMediaDataChange</code>方法，此方法会在视频开始播放时触发<code>AVPlayerItemOutputPullDelegate</code>的方法。</p>
+
+<pre><code class="language-swift">videoOutput.requestNotificationOfMediaDataChange(withAdvanceInterval: 0.03)
+</code></pre></li>
+
+<li><p>监听<code>AVPlayerItemOutputPullDelegate</code>的方法并开始捕获。</p>
+
+<pre><code class="language-swift">public func outputMediaDataWillChange(_ sender: AVPlayerItemOutput) {
+    // 取消暂停，开始捕获
+    displayLink?.isPaused = false
+}
+</code></pre></li>
+
+<li><p>捕获方法<code>handleDisplayLinkCallback</code>参考代码</p>
+
+<pre><code class="language-swift">@objc private func handleDisplayLinkCallback(sender: CADisplayLink) {
+    let nextVSync = sender.timestamp + sender.duration
+    let outputItemTime = videoOutput.itemTime(forHostTime: nextVSync)
+    guard videoOutput.hasNewPixelBuffer(forItemTime: outputItemTime) else { return }
+
+    if let pixelBuffer = videoOutput.copyPixelBuffer(forItemTime: outputItemTime, itemTimeForDisplay: nil) {
+        CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
+        let bitmapInfo = CGBitmapInfo(rawValue: CGBitmapInfo.byteOrder32Little.rawValue | CGImageAlphaInfo.noneSkipFirst.rawValue)
+        let cgContext = CGContext(data: CVPixelBufferGetBaseAddress(pixelBuffer),
+                                  width: CVPixelBufferGetWidth(pixelBuffer),
+                                  height: CVPixelBufferGetHeight(pixelBuffer),
+                                  bitsPerComponent: 8,
+                                  bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer),
+                                  space: CGColorSpaceCreateDeviceRGB(),
+                                  bitmapInfo: bitmapInfo.rawValue)
+        if let cgContext = cgContext,
+            let cgImage = cgContext.makeImage()
+        {
+            delegate?.avplayer(self, didOutput: cgImage)
+        }
+
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
+    }
+}
+</code></pre></li>
+</ol>
+
+<blockquote>
+<p>以上所有过程可以参考<code>SZAVPlayer</code>库Example上的实现例子</p>
+</blockquote>
+
+<h1 id="avplayer缓存原理及问题整理">AVPlayer缓存原理及问题整理</h1>
 
 <p>AVPlayer的缓存原理以及实现思路讲解文章已经有很多现成的，而且讲解的也比较细，可以直接查阅，地址如下：</p>
 
@@ -347,7 +421,7 @@
 
 <p>往下阅读之前确保已经仔细阅读上面列举文章之一，或者已经足够熟悉AVAssetResourceLoaderDelegate。</p>
 
-<h2 id="缓存遇到的问题整理">缓存遇到的问题整理</h2>
+<h2 id="问题整理">问题整理</h2>
 
 <h3 id="avasset的异步加载">AVAsset的异步加载</h3>
 
@@ -473,7 +547,7 @@
 
 <p>基于AVPlayer实现音视频播放相对来说是较理想的实现方式，能够满足常规的音视频播放需求。不过在调研过程中发现市面上的文章和现有库都很零散或者处于不在维护的状态，同时AVPlayer的AVAssetResourceLoader这部分除了基本的描述信息以外基本属于黑盒状态，需要自己在各个系统下摸索出来规律，而且不排除在后续的新系统中这些规律还会不断变化。</p>
 
-<p>基于以上这些原因决定开始编写这个库，是使用Swift编写的。目前支持音频播放，以经过完整的测试接入到自己的音频项目，后续也会支持视频播放。</p>
+<p>基于以上这些原因决定开始编写这个库，是使用Swift编写的。目前支持音视频播放，以经过完整的测试接入到自己的音频项目。</p>
 
 <p>欢迎大家提issue以及共同参与后续维护。</p>
 
@@ -504,6 +578,8 @@
                     <hr class="hidden-sm hidden-xs">
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
+                        
+                        
                         
                         
                         
