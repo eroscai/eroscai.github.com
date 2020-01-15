@@ -463,7 +463,7 @@ arView.session.run(configuration!)
 
 <h2 id="收集协作数据-并发送到其他用户">收集协作数据，并发送到其他用户</h2>
 
-<p>当开启协作模式时 <code>ARKit</code> 会定期地调用 <code>session(_:didOutputCollaborationData:)</code> 方法，此方法提供需要分享给其他用户的协作数据，你需要把这些数据通过网络协议发送给其他用户。可用的一种发送方式是使用<a href="https://developer.apple.com/documentation/multipeerconnectivity">MultipeerConnectivity</a>，这是苹果官方提供的一种点对点通信Framework。</p>
+<p>当开启协作模式时 <code>ARKit</code> 会定期地调用 <code>session(_:didOutputCollaborationData:)</code> 方法，此方法提供需要分享给其他用户的协作数据，你需要把这些数据通过网络协议发送给其他用户。可用的一种发送方式是使用<a href="https://developer.apple.com/documentation/multipeerconnectivity">MultipeerConnectivity</a>，这是苹果官方提供的一种多点连接通信Framework。</p>
 
 <h2 id="更新其他用户发送过来的数据">更新其他用户发送过来的数据</h2>
 
