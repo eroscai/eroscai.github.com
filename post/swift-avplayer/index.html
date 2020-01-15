@@ -73,6 +73,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/docco.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/swift.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
     
@@ -258,11 +259,11 @@
 <ul>
 <li><p>AVPlayer</p>
 
-<p><code>AVPlayer</code>需要<code>AVPlayerItem</code>、<code>AVAsset</code>、<code>AVPlayerLayer</code>等功能类配对使用，支持本地和远程音视频的播放。可以通过添加observer的方式获取到当前播放时间、总播放时间等信息。</p></li>
+<p><code>AVPlayer</code> 需要 <code>AVPlayerItem</code> 、 <code>AVAsset</code> 、 <code>AVPlayerLayer</code> 等功能类配对使用，支持本地和远程音视频的播放。可以通过添加observer的方式获取到当前播放时间、总播放时间等信息。</p></li>
 
 <li><p>AVPlayerItem</p>
 
-<p>封装了<code>AVPlayer</code>播放用的<code>AVAsset</code>的时间以及播放相关的状态变化。可以添加observer进行状态变化的监听，比如是否可以播放、播放失败、加载进度、开始缓冲、缓冲结束等等。</p></li>
+<p>封装了 <code>AVPlayer</code> 播放用的 <code>AVAsset</code> 的时间以及播放相关的状态变化。可以添加observer进行状态变化的监听，比如是否可以播放、播放失败、加载进度、开始缓冲、缓冲结束等等。</p></li>
 
 <li><p>AVAsset</p>
 
@@ -346,7 +347,7 @@
 <h2 id="捕获视频画面的输出-比如想要同时绘制到多个view上时">捕获视频画面的输出（比如想要同时绘制到多个View上时）</h2>
 
 <ol>
-<li><p>创建<code>AVPlayerItemVideoOutput</code>，设定输出的相关参数。</p>
+<li><p>创建 <code>AVPlayerItemVideoOutput</code> ，设定输出的相关参数。</p>
 
 <pre><code class="language-swift">private let videoOutputQueue: DispatchQueue = DispatchQueue(label: &quot;com.SZAVPlayer.videoOutput&quot;)
     
@@ -355,7 +356,7 @@ let videoOutput = AVPlayerItemVideoOutput(outputSettings: settings)
 videoOutput.setDelegate(self, queue: videoOutputQueue)
 </code></pre></li>
 
-<li><p>创建<code>CADisplayLink</code>，用来后续实时的捕获视频画面。</p>
+<li><p>创建 <code>CADisplayLink</code> ，用来后续实时的捕获视频画面。</p>
 
 <pre><code class="language-swift">let link = CADisplayLink(target: self, selector: #selector(handleDisplayLinkCallback))
 link.add(to: RunLoop.current, forMode: .default)
@@ -363,14 +364,14 @@ link.add(to: RunLoop.current, forMode: .default)
 link.isPaused = true
 </code></pre></li>
 
-<li><p><code>AVPlayerItem</code>创建好以后使用<code>add(_ output: AVPlayerItemOutput)</code>方法添加output到playerItem上。</p></li>
+<li><p><code>AVPlayerItem</code> 创建好以后使用 <code>add(_ output: AVPlayerItemOutput)</code> 方法添加output到playerItem上。</p></li>
 
-<li><p>调用play方法播放之前需要调用一下<code>requestNotificationOfMediaDataChange</code>方法，此方法会在视频开始播放时触发<code>AVPlayerItemOutputPullDelegate</code>的方法。</p>
+<li><p>调用play方法播放之前需要调用一下 <code>requestNotificationOfMediaDataChange</code> 方法，此方法会在视频开始播放时触发 <code>AVPlayerItemOutputPullDelegate</code> 的方法。</p>
 
 <pre><code class="language-swift">videoOutput.requestNotificationOfMediaDataChange(withAdvanceInterval: 0.03)
 </code></pre></li>
 
-<li><p>监听<code>AVPlayerItemOutputPullDelegate</code>的方法并开始捕获。</p>
+<li><p>监听 <code>AVPlayerItemOutputPullDelegate</code> 的方法并开始捕获。</p>
 
 <pre><code class="language-swift">public func outputMediaDataWillChange(_ sender: AVPlayerItemOutput) {
     // 取消暂停，开始捕获
@@ -378,7 +379,7 @@ link.isPaused = true
 }
 </code></pre></li>
 
-<li><p>捕获方法<code>handleDisplayLinkCallback</code>参考代码</p>
+<li><p>捕获方法 <code>handleDisplayLinkCallback</code> 参考代码</p>
 
 <pre><code class="language-swift">@objc private func handleDisplayLinkCallback(sender: CADisplayLink) {
     let nextVSync = sender.timestamp + sender.duration
@@ -408,7 +409,7 @@ link.isPaused = true
 </ol>
 
 <blockquote>
-<p>以上所有过程可以参考<code>SZAVPlayer</code>库Example上的实现例子</p>
+<p>以上所有过程可以参考 <code>SZAVPlayer</code> 库Example上的实现例子</p>
 </blockquote>
 
 <h1 id="avplayer缓存原理及问题整理">AVPlayer缓存原理及问题整理</h1>
@@ -440,7 +441,7 @@ link.isPaused = true
 
 <h3 id="avassetresourceloaderdelegate设置">AVAssetResourceLoaderDelegate设置</h3>
 
-<p><code>AVAssetResourceLoaderDelegate</code>设置时必须配对非常规schema，就是非http/https的自定义schema，否则这个delegate里的方法是不会有机会被调用。通常会采取如下做法：</p>
+<p><code>AVAssetResourceLoaderDelegate</code> 设置时必须配对非常规schema，就是非http/https的自定义schema，否则这个delegate里的方法是不会有机会被调用。通常会采取如下做法：</p>
 
 <ul>
 <li>把自定义schema先拼接到最前面进行Asset的初始化，然后需要使用url时再从最前面剔除自定义schema获取原始链接</li>
@@ -456,7 +457,7 @@ link.isPaused = true
 <p>AVAssetResourceLoader的执行过程可以简单理解为ContentInfoRequest和DataRequest两部分。</p>
 
 <blockquote>
-<p>AVAssetResourceLoader发的请求都是AVAssetResourceLoadingRequest类型，里面包含<code>contentInformationRequest</code>和<code>dataRequest</code>两个属性。</p>
+<p>AVAssetResourceLoader发的请求都是AVAssetResourceLoadingRequest类型，里面包含 <code>contentInformationRequest</code> 和 <code>dataRequest</code> 两个属性。</p>
 </blockquote>
 
 <h4 id="contentinforequest">ContentInfoRequest</h4>
@@ -524,7 +525,7 @@ link.isPaused = true
 <p>当发起的数据请求有数据返回时需要实时反馈给AVAssetResourceLoader的AVAssetResourceLoadingRequest，然后AVAssetResourceLoader会自行判断Player是否可以播放、是否超时、是否出错等等状态，并通知到各个监听者。</p>
 
 <blockquote>
-<p>此部分实现代码可参考<code>SZAVPlayerAssetLoader</code>的<code>handleDataRequest</code>方法。其中由<code>SZAVPlayerDataLoader</code>负责管理和维护数据请求相关操作。</p>
+<p>此部分实现代码可参考 <code>SZAVPlayerAssetLoader</code> 的 <code>handleDataRequest</code> 方法。其中由 <code>SZAVPlayerDataLoader</code> 负责管理和维护数据请求相关操作。</p>
 </blockquote>
 
 <h2 id="片段请求异常结束时是否缓存已加载数据">片段请求异常结束时是否缓存已加载数据</h2>
@@ -537,7 +538,7 @@ link.isPaused = true
 
 <h2 id="无网环境下是否可以播放">无网环境下是否可以播放</h2>
 
-<p>如果实现了完整的<code>AVAssetResourceLoaderDelegate</code>流程，在调用AVAsset的<code>loadValuesAsynchronously</code>方法时不管有网还是无网都会走上面讲的AVAssetResourceLoader适配流程，所以在无网状态下也能正常播放已缓存的部分。</p>
+<p>如果实现了完整的 <code>AVAssetResourceLoaderDelegate</code> 流程，在调用AVAsset的 <code>loadValuesAsynchronously</code> 方法时不管有网还是无网都会走上面讲的AVAssetResourceLoader适配流程，所以在无网状态下也能正常播放已缓存的部分。</p>
 
 <blockquote>
 <p>如果考虑无网模式下也要正常播放的话除了数据缓存以外ContentInfoRequest部分也要持久化到本地，否则ResourceLoader过程的第一步就走不通。</p>
@@ -557,6 +558,11 @@ link.isPaused = true
                 <hr>
                 <ul class="pager">
                     
+                    
+                    <li class="next">
+                        <a href="/post/arkit3/" data-toggle="tooltip" data-placement="top" title="ARKit3 和 RealityKit 介绍">Next
+                            Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -578,6 +584,10 @@ link.isPaused = true
                     <hr class="hidden-sm hidden-xs">
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
+                        
+                        
+                        
+                        
                         
                         
                         

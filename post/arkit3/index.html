@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="落叶">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="http://caisanze.com/img/home_bg.jpeg">
+    <meta property="twitter:image" content="http://caisanze.com/img/home_bg.jpeg" />
+    
+
+    
+    <meta name="title" content="ARKit3 和 RealityKit 介绍" />
+    <meta property="og:title" content="ARKit3 和 RealityKit 介绍" />
+    <meta property="twitter:title" content="ARKit3 和 RealityKit 介绍" />
+    
+
+    
+    <meta name="description" content="2019年苹果推出了一个新的ARKit版本（ARKit3）和专门为AR场景研发的RealityKit。从WWDC视频和官网介绍上可以看出新的ARKit3 &#43; RealityKit组合带来了很多新的应用场景以及显著提高了开发体验和使用体验">
+    <meta property="og:description" content="2019年苹果推出了一个新的ARKit版本（ARKit3）和专门为AR场景研发的RealityKit。从WWDC视频和官网介绍上可以看出新的ARKit3 &#43; RealityKit组合带来了很多新的应用场景以及显著提高了开发体验和使用体验" />
+    <meta property="twitter:description" content="2019年苹果推出了一个新的ARKit版本（ARKit3）和专门为AR场景研发的RealityKit。从WWDC视频和官网介绍上可以看出新的ARKit3 &#43; RealityKit组合带来了很多新的应用场景以及显著提高了开发体验和使用体验" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="Objective C, Swift">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>ARKit3 和 RealityKit 介绍-落叶的博客 | LuoYe Blog</title>
+
+    <link rel="canonical" href="/post/arkit3/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+    
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/docco.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/swift.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">落叶</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/swift">swift</a>
+                    </li>
+                    
+                    
+		    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home_bg.jpeg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/arkit" title="ARKit">
+                            ARKit
+                        </a>
+                        
+                        <a class="tag" href="/tags/realitykit" title="RealityKit">
+                            RealityKit
+                        </a>
+                        
+                    </div>
+                    <h1>ARKit3 和 RealityKit 介绍</h1>
+                    <h2 class="subheading">介绍ARKit3和RealityKit带来了哪些功能，有哪些屌爆的特性以及体验</h2>
+                    <span class="meta">
+                        2020-01-15
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#reality-composer-realitykit">Reality Composer &amp; RealityKit</a>
+<ul>
+<li><a href="#reality-composer">Reality Composer</a></li>
+<li><a href="#realitykit">RealityKit</a></li>
+</ul></li>
+<li><a href="#people-occlusion-人物遮挡">People Occlusion（人物遮挡）</a></li>
+<li><a href="#motion-capture-动作捕捉">Motion Capture（动作捕捉）</a>
+<ul>
+<li><a href="#识别骨骼">识别骨骼</a></li>
+<li><a href="#连通角色-character-和机器人">连通角色（Character）和机器人</a></li>
+<li><a href="#监听骨骼节点的变化">监听骨骼节点的变化</a></li>
+</ul></li>
+<li><a href="#simultaneous-front-and-back-camera-同时使用前置和后置摄像头">Simultaneous Front and Back Camera（同时使用前置和后置摄像头）</a></li>
+<li><a href="#collaborative-sessions-协作会话">Collaborative Sessions（协作会话）</a>
+<ul>
+<li><a href="#开启协作模式">开启协作模式</a></li>
+<li><a href="#收集协作数据-并发送到其他用户">收集协作数据，并发送到其他用户</a></li>
+<li><a href="#更新其他用户发送过来的数据">更新其他用户发送过来的数据</a></li>
+<li><a href="#更快的促成场景地图的合并">更快的促成场景地图的合并</a></li>
+</ul></li>
+<li><a href="#结语">结语</a></li>
+</ul>
+</nav>
+                
+                
+
+<h1 id="前言">前言</h1>
+
+<p>在之前的苹果系统上进行AR开发需要依赖于SceneKit（一个为手机端开发3D游戏或者3D内容而研发出来的3D渲染库），苹果基于这个库封装出来一些AR相关功能供开发者使用，但是SceneKit不是专门的AR库，带来了很多问题，并且提供的功能和实际表现差强人意。</p>
+
+<p>2019年苹果推出了一个新的ARKit版本（ARKit3）和专门为AR场景研发的RealityKit。从WWDC视频和官网介绍上可以看出新的ARKit3 + RealityKit组合带来了很多新的应用场景以及显著提高了开发体验和使用体验。</p>
+
+<p>所有这些功能基本上都需要最新系统（iOS13）和最新设备（XR及以上），语言上需要使用Swift进行开发。下面我们挑一些重点项一个个研究一下。</p>
+
+<h1 id="reality-composer-realitykit">Reality Composer &amp; RealityKit</h1>
+
+<p>这个全新的高级框架专门为AR量身定制，能够提供逼真的图像渲染、相机特效、动画、物理特效等等。借助原生ARKit整合提供物理的超逼真渲染、变换和骨骼动画、空间音频和<a href="https://zh.wikipedia.org/wiki/%E5%88%9A%E4%BD%93">刚体物理</a>等等。</p>
+
+<p>听起来想自己实现这些门槛会非常高，需要非常资深的数学知识和物理知识才能实现。但是使用Reality Composer只需拖拖拖点点点，在几乎没几行代码的情况下就能构建出一个体验非常良好的AR APP。</p>
+
+<h2 id="reality-composer">Reality Composer</h2>
+
+<p>Reality Composer在MAC、iPhone、iPad三个平台都可以使用，同时可以进行无缝切换。它内建AR资源库，也可以自己导入一些新的第三方资源。常规的动画或者物理特性已经完整内嵌在工具里，只需选择想使用的动画或者动作，比如旋转或者摆动等等。不管你是开发者还是产品还是设计师都可以无门槛的创造属于你自己的AR场景。</p>
+
+<p>Composer的界面非常的简洁，只有零星几个按钮可以触发，比如添加对象、添加文本、添加行为、修改属性等等。但是简洁的界面背后藏不住这个工具的强悍，整个使用过程非常“傻瓜式”，不需要进行太多思考就可知道应该如何使用，下面贴几张图感受一下。</p>
+
+<p><img src="/images/arkit-triggers.jpg" alt="添加触发器" /></p>
+
+<p>触发器类型如下：</p>
+
+<ul>
+<li><code>Start</code> - 当AR场景开始时触发。</li>
+<li><code>Tap</code> - 当点击时触发。</li>
+<li><code>Proximity</code> - 当相机识别到靠近行为时触发。</li>
+<li><code>Collision</code> - 当碰撞时触发。</li>
+<li><code>Notification</code> - 当接收到通知时触发。</li>
+</ul>
+
+<p><img src="/images/arkit-action-loop.jpg" alt="添加动作" /></p>
+
+<p>可以看到动作是一个一个按顺序执行的，如果想要同时执行多个动作可以组成一个group（拖拖拖就能完成），如果想循环也可以很方便的一键添加。</p>
+
+<p>还可以添加各类动作，比如突出、旋转、轨道旋转、自定义等等。</p>
+
+<p>当编辑完AR场景以后可以一键导出后缀为 <code>.rcproject</code> 的文件，此文件可以直接拖入到XCODE里面。然后XCODE会基于Swift特性自动创建出对应于此资源文件的Class供你使用。以官方DEMO上的 <code>Experience.rcproject</code> 为例，它会生成一个 <code>Experience.swift</code> 类，里面完整的包含了你在Composer里面定义的所有行为，包括load方式。然后就可以在工程里这样使用：</p>
+
+<pre><code class="language-swift">Experience.loadGameAsync { [weak self] result in
+    switch result {
+    case .success(let game):
+        // success                        
+    case .failure(let error):
+        // error
+    }
+}
+</code></pre>
+
+<p>如果看到这些还觉得不够震撼的话，建议自己下下来DEMO跑到真机上体验一下，你会发现实现一个不算简单的小游戏，真正动手写的代码寥寥几行。地址在这里，<a href="https://developer.apple.com/documentation/realitykit/creating_a_game_with_reality_composer">Creating a Game with Reality Composer</a>。</p>
+
+<h2 id="realitykit">RealityKit</h2>
+
+<p>这里稍微的展示一下RealityKit的强悍和简便，带大家演示一下如何把一个虚拟对象加入到AR场景中。</p>
+
+<ol>
+<li><p>创建 <code>ARView</code> 。</p>
+
+<pre><code class="language-swift">let view = ARView(frame: self.view.bounds)
+// 添加ARCoachingOverlayView
+view.addCoaching(goal: .horizontalPlane, delegate: self)
+</code></pre></li>
+
+<li><p>添加 <code>ARCoachingOverlayView</code> 。顾名思义，这个视图是引导用户去寻找合适的AR场景，帮助 <code>ARView</code> 搜集所需的信息，整个过程都进行了良好的封装，全部自动识别和判定。添加代码大概如下：</p>
+
+<pre><code class="language-swift">func addCoaching(goal: ARCoachingOverlayView.Goal, delegate: ARCoachingOverlayViewDelegate?) {
+    // Create a ARCoachingOverlayView object
+    let coachingOverlay = ARCoachingOverlayView()
+    coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(coachingOverlay)
+    NSLayoutConstraint.activate([
+        coachingOverlay.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+        coachingOverlay.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+        coachingOverlay.widthAnchor.constraint(equalTo: self.widthAnchor),
+        coachingOverlay.heightAnchor.constraint(equalTo: self.heightAnchor)
+    ])
+    
+    // Set the Augmented Reality goal
+    coachingOverlay.goal = goal
+    // Set the ARSession
+    coachingOverlay.session = self.session
+    // Set the delegate for any callbacks
+    coachingOverlay.delegate = delegate
+    coachingOverlay.activatesAutomatically = true
+}
+</code></pre></li>
+
+<li><p>启动AR会话。</p>
+
+<pre><code class="language-swift">arView.session.run(ARWorldTrackingConfiguration(), options: [])
+</code></pre></li>
+
+<li><p>添加虚拟对象到<code>ARView</code>。</p>
+
+<pre><code class="language-swift">loadRequest = ModelEntity.loadAsync(named: &quot;gramophone&quot;)
+    .sink(receiveCompletion: { [weak self] (loadCompletion) in
+            // 如果出错会跑到这里
+        }, receiveValue: { [weak self] (entity) in
+            // 如果成功会跑到这里
+            guard let self = self else { return }
+            // Place model on a horizontal plane.
+            let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.15, 0.15])
+            self.arView.scene.anchors.append(anchor)
+    
+            entity.scale = [1, 1, 1] * 0.006
+            anchor.children.append(entity)
+    })
+</code></pre>
+
+<blockquote>
+<p>这里 <code>loadAsync()</code> 是异步加载的方式，不会造成卡顿现象。另外还提供一种同步加载方法<code>load()</code>，会造成明显的卡顿，想不通什么场景下会用到这个方法。</p>
+
+<p>这里注意的是loadAsync返回的是 <code>LoadRequest</code> 类型， <code>LoadRequest</code> 实现了<code>Publisher</code>协议，所以看到下方是使用 <code>sink</code> 方法进行订阅接收load结果，使用起来非常简便。</p>
+
+<p>还有一个注意的点是可以看到我这里是使用 <code>loadRequest</code> 对象对 <code>sink</code> 的返回体进行持有，这样才能保证整个load流程不会被中断，因为是个异步过程，如果不进行持有的话在结果返回前就可能被释放了，然后 <code>receiveValue</code> 这块代码永远都没机会执行。</p>
+</blockquote></li>
+</ol>
+
+<h1 id="people-occlusion-人物遮挡">People Occlusion（人物遮挡）</h1>
+
+<p>在之前的AR环境（ARKit2）里绘制虚拟对象只能显示在最顶层，也就是虚拟对象会覆盖所有其他内容。比如一个人经过一个虚拟对象并产生遮住行为时虚拟内容会显示在人体之上。产生这个问题的原因很简单，AR的绘制可以简单理解为把虚拟内容绘制在相机捕获出来的平面内容上，比如下图所示：</p>
+
+<p><img src="/images/arkit-people-occlusion-normal.jpg" width = "300" height = "200" alt="虚拟对象在人体之前" align=center /></p>
+
+<p>最新的ARKit可以从相机内容中分割出人体部分，然后把人体和虚拟对象结合在一起进行绘制就能达到人体遮照效果，如下图所示：</p>
+
+<p><img src="/images/arkit-people-occlusion-now.jpg" width = "500" height = "200" alt="虚拟对象在人体之后" align=center /></p>
+
+<p>进一步的在XR及以上的设备上可以利用景深（Depth）功能探测出多个人体和虚拟对象距离相机有多远，从而灵活的判断哪一部分需要遮照，哪一部分不需要，如下图所示：</p>
+
+<p><img src="/images/arkit-people-occlusion-depth.jpg" width = "500" height = "200" alt="虚拟对象在两个人体之间" align=center /></p>
+
+<p>开启和关闭People Occlusion效果的代码非常简单，只需修改config的属性即可，如下：</p>
+
+<pre><code class="language-swift">if true/false {
+    config.frameSemantics.remove(.personSegmentationWithDepth)
+} else {
+    config.frameSemantics.insert(.personSegmentationWithDepth)
+}
+arView.session.run(config)
+</code></pre>
+
+<p>也可以到苹果官网进行DEMO的下载，自己进行尝试，<a href="https://developer.apple.com/documentation/arkit/occluding_virtual_content_with_people">代码地址</a>。</p>
+
+<p>针对人物遮挡有很细致的原理和高阶用法介绍（获取到People Occlusion的结果自行绘制）有专门的WWDC视频，有兴趣的可以去看一下，<a href="https://developer.apple.com/videos/play/wwdc2019/607">Bringing People into AR</a>的前半部分。</p>
+
+<h1 id="motion-capture-动作捕捉">Motion Capture（动作捕捉）</h1>
+
+<p>用单个摄像头实时捕捉人物的动作。将身体姿态和动作化为一系列关节及骨骼活动，可以让虚拟对象（机器人）跟着画面中的人物一起动。</p>
+
+<h2 id="识别骨骼">识别骨骼</h2>
+
+<p>依赖于机器学习，现在可以在相机画面中识别出人体骨骼结构，分为3D和2D两种类型，以3D为例参考如下图：</p>
+
+<p><img src="/images/arkit-motion-capture-skeleton.jpg" alt="3D骨骼结构" /></p>
+
+<p>可以看出从最左侧的人像里面识别出了三维的骨骼结构，骨骼结构包含着数十个节点，以根节点为基础连通了所有其他子节点，如下图所示：</p>
+
+<p><img src="/images/arkit-motion-capture-skeleton-detail.jpg" alt="3D骨骼结构细节" /></p>
+
+<h2 id="连通角色-character-和机器人">连通角色（Character）和机器人</h2>
+
+<p>动作捕捉的硬性要求就是这些虚拟对象创建时也需要有同样的骨骼结构及同样的命名方式，所以带来了画面中的人物角色跟虚拟对象连通的可能性，连通方式也非常简单，分为下面几个步骤：</p>
+
+<ol>
+<li>使用 <code>ARBodyTrackingConfiguration</code> 启动AR场景</li>
+<li>添加 <code>AnchorEntity</code></li>
+<li>加载 <code>BodyTrackedEntity</code> 添加到上一步的 <code>AnchorEntity</code> 里面</li>
+</ol>
+
+<h2 id="监听骨骼节点的变化">监听骨骼节点的变化</h2>
+
+<p>当上面连通部分完成以后就可以在 <code>ARSessionDelegate</code> 里面获取到骨骼节点在每一帧的变化信息，然后可以把变化赋值到 <code>AnchorEntity</code> 同步进行改变。可以看到实现一个基础的动作捕捉功能非常简单，只需寥寥几行代码就可实现。</p>
+
+<p>当然，这只是一个基础用法，当你能获取到人物的每一帧的骨骼节点变化信息时，能扩展出很多应用场景，就看你的想象力有多丰富了。针对骨骼节点是如何组装的、如何表现的以及3D和2D模式下有何不同有着更细节的WWDC视频，有兴趣的可以去了解一下，
+<a href="https://developer.apple.com/videos/play/wwdc2019/607">Bringing People into AR</a>的后半部分。</p>
+
+<h1 id="simultaneous-front-and-back-camera-同时使用前置和后置摄像头">Simultaneous Front and Back Camera（同时使用前置和后置摄像头）</h1>
+
+<p>现在，您可以同时使用前置和后置摄像头来进行面部和现实场景跟踪，开创新的可能。例如，用户可以使用自己的面部与后置摄像头视图中的 AR 内容进行交互。</p>
+
+<p>直白的讲就是现在可以在使用后置摄像头跟踪现实场景变化的同时还可以使用前置摄像头捕获面部的变化，就像下面这样设置就可以：</p>
+
+<pre><code class="language-swift">let configuration = ARWorldTrackingConfiguration()
+configuration.planeDetection = [.horizontal, .vertical]
+
+if ARWorldTrackingConfiguration.supportsUserFaceTracking {
+    configuration.userFaceTrackingEnabled = true
+}
+
+// 反过来也可以这样设置
+let configuration = ARFaceTrackingConfiguration()
+if ARFaceTrackingConfiguration.supportsWorldTracking {
+    configuration.isWorldTrackingEnabled = true
+}
+</code></pre>
+
+<p>但是发现这个特性目前还没有办法很好的使用在 <code>ARKit</code> + <code>RealityKit</code> 这个组合上，搜寻了所有的官方文档以及资料都是停留在 <code>ARKit</code> + <code>SceneKit</code> 的例子上。我还发起了一个提问，得到的答复也是如此，<a href="https://stackoverflow.com/questions/59684132/is-it-possible-to-track-a-face-and-render-it-in-realitykit-arview">StackOverflow提问地址</a></p>
+
+<p>如果对旧的实现方式感兴趣，可以参考这个官方文档和例子，<a href="https://developer.apple.com/documentation/arkit/tracking_and_visualizing_faces">Tracking and Visualizing Faces</a>。</p>
+
+<h1 id="collaborative-sessions-协作会话">Collaborative Sessions（协作会话）</h1>
+
+<p>通过多人之间的实时协作会话，您可以构建一个协作的现实场景地图，加快 AR 体验的开发速度，用户也能更快地获得像多人游戏那样的共通 AR 体验。</p>
+
+<p>通过协作会话，<code>ARKit</code> 定期地给每一个在会话里的人提供数据，然后你可以选择一种network协议来发送这个数据。会话提供的数据里面包含着每一个参与者的锚点信息，这些锚点代表着每一个参与者的大概位置，<code>ARKit</code> 还提供其他参与者所创造出来的所有锚点。如下图是苹果官方给出的一个DEMO里的示例图：</p>
+
+<p><img src="/images/arkit-collaborative-session-example.png" alt="多个用户之间的协作会话" /></p>
+
+<p>实现协作会话的过程大致如下：</p>
+
+<h2 id="开启协作模式">开启协作模式</h2>
+
+<p>协作模式只限在 <code>ARWorldTrackingConfiguration</code> 场景下。可以使用 <code>isCollaborationEnabled</code> 变量开启协作模式。</p>
+
+<pre><code class="language-swift">configuration = ARWorldTrackingConfiguration()
+
+// Enable a collaborative session.
+configuration?.isCollaborationEnabled = true
+
+// Enable realistic reflections.
+configuration?.environmentTexturing = .automatic
+
+// Begin the session.
+arView.session.run(configuration!)
+</code></pre>
+
+<h2 id="收集协作数据-并发送到其他用户">收集协作数据，并发送到其他用户</h2>
+
+<p>当开启协作模式时 <code>ARKit</code> 会定期地调用 <code>session(_:didOutputCollaborationData:)</code> 方法，此方法提供需要分享给其他用户的协作数据，你需要把这些数据通过网络协议发送给其他用户。可用的一种发送方式是使用<a href="https://developer.apple.com/documentation/multipeerconnectivity">MultipeerConnectivity</a>，这是苹果官方提供的一种点对点通信Framework。</p>
+
+<h2 id="更新其他用户发送过来的数据">更新其他用户发送过来的数据</h2>
+
+<p>当接收到其他用户发送过来的会话信息时你需要及时更新到当前会话里，如下：</p>
+
+<pre><code class="language-swift">func receivedData(_ data: Data, from peer: MCPeerID) {
+    if let collaborationData = try? NSKeyedUnarchiver.unarchivedObject(ofClass: ARSession.CollaborationData.self, from: data) {
+        arView.session.update(with: collaborationData)
+        return
+    }
+    // ...
+}
+</code></pre>
+
+<h2 id="更快的促成场景地图的合并">更快的促成场景地图的合并</h2>
+
+<p><code>ARKit</code> 需要通过两个用户各自的场景地图中的重叠部分来判断用户之间的对应关系。当 <code>ARKit</code> 成功的进行场景合并操作以后，它就可以开始分享每个用户的对应位置以及他们创建出来的新的锚点。</p>
+
+<p>如果想要促成场景合并，一个用户必须扫描到前一个用户访问过的某个区域，也就是需要产生重叠区域，然后 <code>ARKit</code> 会默默给你促成合并。</p>
+
+<p>这样一个简单的协作会话流程就已经走通了，剩下的就是看你如何补充更多细节了，比如点击屏幕时根据换算出的位置填充虚拟对象进去，同时也可以给每个用户标配一种颜色用来区别不同用户摆放的虚拟对象，还可以给虚拟对象添加各种交互事件等等。</p>
+
+<p>这一部分简单的实现DEMO可以参考苹果的这个文档，<a href="https://developer.apple.com/documentation/arkit/creating_a_collaborative_session">Creating a Collaborative Session</a>。</p>
+
+<h1 id="结语">结语</h1>
+
+<p>以上就是最新的 <code>ARKit3</code> 和 <code>RealityKit</code> 所带来的部分介绍，除了这些还有很多优化型的更新，比如一次检测最多 100 张图像，并自动估计图像的实际尺寸，3D对象检测功能变得更强大，可以在复杂的环境中更好地识别对象，可以更快地检测环境中的平面等等等等。</p>
+
+<p>有一点需要提的是目前阶段还没有办法使用 <code>RealityKit</code> 完全替代 <code>SceneKit</code>。毕竟目前的 <code>RealityKit</code> 只是第一个版本，有一些功能点还无法做到 <code>SceneKit</code> 那么丰富，所以一部分功能的官方文档和例子上都停留在去年或者前年的时间点上。还有一个点是可以看出上面整理的例子以及目前市面上的资料来说这些新功能点的实现都只停留在接入层面上，如果想做某一个功能点的深入实现，难度还是非常大的，需要你在这全新的领域里面不断开荒。</p>
+
+<p>总而言之，苹果在19年针对AR功能进行了质的改进，尽可能的降低了接入门槛（Reality Composer）以及简化并提升了开发体验（RealityKit）。单单从提供一个全新的AR库的态度来说已经说明了苹果的决心，相信接下来随着每一年的更新迭代会让AR相关领域的开发变的更加丰富起来。</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/swift-avplayer/" data-toggle="tooltip" data-placement="top" title="SZAVPlayer">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href='' rel="alternate" type="application/rss+xml" title="落叶" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:csz0102@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/eroscai">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 落叶 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

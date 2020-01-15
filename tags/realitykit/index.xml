@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on 落叶</title>
-    <link>http://caisanze.com/post/</link>
-    <description>Recent content in Posts on 落叶</description>
+    <title>RealityKit on 落叶</title>
+    <link>http://caisanze.com/tags/realitykit/</link>
+    <description>Recent content in RealityKit on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Wed, 15 Jan 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://caisanze.com/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://caisanze.com/tags/realitykit/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>http://caisanze.com/post/arkit3/</guid>
       <description>前言 在之前的苹果系统上进行AR开发需要依赖于SceneKit（一个为手机端开发3D游戏或者3D内容而研发出来的3D渲染库），苹果基于这个库封</description>
-    </item>
-    
-    <item>
-      <title>SZAVPlayer</title>
-      <link>http://caisanze.com/post/swift-avplayer/</link>
-      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>http://caisanze.com/post/swift-avplayer/</guid>
-      <description>前言 最近正好在开发音频播放功能，所以基于AVPlayer实现了SZAVPlayer这个库，完整实现了音频播放功能，同时实现了缓存。在实现缓存</description>
     </item>
     
   </channel>
