@@ -415,7 +415,7 @@ arView.session.run(config)
 
 <p>现在，您可以同时使用前置和后置摄像头来进行面部和现实场景跟踪，开创新的可能。例如，用户可以使用自己的面部与后置摄像头视图中的 AR 内容进行交互。</p>
 
-<p>直白的讲就是现在可以在使用后置摄像头跟踪现实场景变化的同时还可以使用前置摄像头捕获面部的变化，就像下面这样设置就可以：</p>
+<p>直白的讲就是现在可以在使用后置摄像头跟踪现实场景变化的同时还可以使用前置摄像头捕获面部的变化，反之亦然，就像下面这样设置就可以：</p>
 
 <pre><code class="language-swift">let configuration = ARWorldTrackingConfiguration()
 configuration.planeDetection = [.horizontal, .vertical]
@@ -431,7 +431,11 @@ if ARFaceTrackingConfiguration.supportsWorldTracking {
 }
 </code></pre>
 
-<p>但是发现这个特性目前还没有办法很好的使用在 <code>ARKit</code> + <code>RealityKit</code> 这个组合上，搜寻了所有的官方文档以及资料都是停留在 <code>ARKit</code> + <code>SceneKit</code> 的例子上。我还发起了一个提问，得到的答复也是如此，<a href="https://stackoverflow.com/questions/59684132/is-it-possible-to-track-a-face-and-render-it-in-realitykit-arview">StackOverflow提问地址</a></p>
+<p>苹果给出的一个简单的应用场景示例图，在实时场景画面中绘制面部数据的改变：</p>
+
+<p><img src="/images/arkit-simultaneous-camera-example.jpg" alt="在实时场景画面中绘制面部数据的改变" /></p>
+
+<p>但是发现这个特性目前还没有办法很好的使用在 <code>ARKit</code> + <code>RealityKit</code> 这个组合上，搜寻了所有的官方文档以及资料都是停留在 <code>ARKit</code> + <code>SceneKit</code> 的例子上。我还发起了一个提问，得到的答复也是如此，<a href="https://stackoverflow.com/questions/59684132/is-it-possible-to-track-a-face-and-render-it-in-realitykit-arview">StackOverflow提问地址</a>。</p>
 
 <p>如果对旧的实现方式感兴趣，可以参考这个官方文档和例子，<a href="https://developer.apple.com/documentation/arkit/tracking_and_visualizing_faces">Tracking and Visualizing Faces</a>。</p>
 
@@ -463,11 +467,11 @@ arView.session.run(configuration!)
 
 <h2 id="收集协作数据-并发送到其他用户">收集协作数据，并发送到其他用户</h2>
 
-<p>当开启协作模式时 <code>ARKit</code> 会定期地调用 <code>session(_:didOutputCollaborationData:)</code> 方法，此方法提供需要分享给其他用户的协作数据，你需要把这些数据通过网络协议发送给其他用户。可用的一种发送方式是使用<a href="https://developer.apple.com/documentation/multipeerconnectivity">MultipeerConnectivity</a>，这是苹果官方提供的一种多点连接通信Framework。</p>
+<p>当开启协作模式时 <code>ARKit</code> 会定期地调用 <code>session(_:didOutputCollaborationData:)</code> 方法，监听到此代理方法被调用时你需要把这些数据通过网络协议发送给其他用户，以保证所有用户的数据都是一致的。可用的一种发送方式是使用<a href="https://developer.apple.com/documentation/multipeerconnectivity">MultipeerConnectivity</a>，这是苹果官方提供的一种多点连接通信Framework。</p>
 
 <h2 id="更新其他用户发送过来的数据">更新其他用户发送过来的数据</h2>
 
-<p>当接收到其他用户发送过来的会话信息时你需要及时更新到当前会话里，如下：</p>
+<p>当监听到 <code>session(_:didReceive:fromPeer:)</code> 代理方法被调用时你需要及时更新到 <code>ARView</code> 的当前会话里，如下：</p>
 
 <pre><code class="language-swift">func receivedData(_ data: Data, from peer: MCPeerID) {
     if let collaborationData = try? NSKeyedUnarchiver.unarchivedObject(ofClass: ARSession.CollaborationData.self, from: data) {
@@ -480,13 +484,22 @@ arView.session.run(configuration!)
 
 <h2 id="更快的促成场景地图的合并">更快的促成场景地图的合并</h2>
 
-<p><code>ARKit</code> 需要通过两个用户各自的场景地图中的重叠部分来判断用户之间的对应关系。当 <code>ARKit</code> 成功的进行场景合并操作以后，它就可以开始分享每个用户的对应位置以及他们创建出来的新的锚点。</p>
+<p><code>ARKit</code> 需要通过两个用户扫描出来的各自的场景地图信息中判断用户之间的对应关系，然后进行合并操作。当 <code>ARKit</code> 成功的进行场景合并操作以后，它就可以开始分享每个用户的对应位置以及他们创建出来的新的锚点。</p>
 
-<p>如果想要促成场景合并，一个用户必须扫描到前一个用户访问过的某个区域，也就是需要产生重叠区域，然后 <code>ARKit</code> 会默默给你促成合并。</p>
+<p>如果想要促成场景合并，一个用户必须扫描到前一个用户访问过的某个区域，也就是需要产生重叠区域，然后 <code>ARKit</code> 会默默给你促成合并，参考以下信息：</p>
+
+<p>如图两个用户各自在不同地方收集了不同的场景信息，分别为绿色点和粉色点。</p>
+
+<p><img src="/images/arkit-collaborative-sessions-before.jpg" alt="场景地图合并之前" /></p>
+
+<p>当两个用户拍摄到同一个区域时 <code>ARKit</code> 能计算出两个用户相对位置和信息对应关系，然后默默进行合并，如下图合并以后都变成了黄色的点，再往后用户各自收集的信息都能实时分享到另一个用户那里。</p>
+
+<p><img src="/images/arkit-collaborative-sessions-after.jpg" alt="场景地图合并之后" /></p>
 
 <p>这样一个简单的协作会话流程就已经走通了，剩下的就是看你如何补充更多细节了，比如点击屏幕时根据换算出的位置填充虚拟对象进去，同时也可以给每个用户标配一种颜色用来区别不同用户摆放的虚拟对象，还可以给虚拟对象添加各种交互事件等等。</p>
 
-<p>这一部分简单的实现DEMO可以参考苹果的这个文档，<a href="https://developer.apple.com/documentation/arkit/creating_a_collaborative_session">Creating a Collaborative Session</a>。</p>
+<p>这一部分简单的实现DEMO可以参考苹果的这个文档，<a href="https://developer.apple.com/documentation/arkit/creating_a_collaborative_session">Creating a Collaborative Session</a>。
+还有更细致的WWDC视频也可以看一下，<a href="https://developer.apple.com/videos/play/wwdc2019/610/">Building Collaborative AR Experiences</a>。</p>
 
 <h1 id="结语">结语</h1>
 
