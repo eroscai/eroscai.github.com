@@ -179,8 +179,31 @@
 
          	
                 
-<div id="disqus-comment"></div>
 
+
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+    const gitalk = new Gitalk({
+        clientID: '707fab9a3b3e200c57b1',
+        clientSecret: '6bf3cf75ae3a18ac46eb5138042babcad67191b1',
+        repo: 'https:\/\/github.com\/eroscai',
+        owner: 'csz0102@gmail.com',
+        admin: ['csz0102@gmail.com'],
+        id: decodeURI(location.pathname), 
+        distractionFreeMode: false 
+    });
+    (function () {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML =
+                'Gitalk comments not available by default when the website is previewed locally.';
+            return;
+        }
+        gitalk.render('gitalk-container');
+    })();
+</script>
 
 
             </div>
