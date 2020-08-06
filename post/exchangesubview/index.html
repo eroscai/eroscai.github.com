@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="" />
-    <meta property="og:title" content="" />
-    <meta property="twitter:title" content="" />
+    <meta name="title" content="exchangeSubview 踩坑记" />
+    <meta property="og:title" content="exchangeSubview 踩坑记" />
+    <meta property="twitter:title" content="exchangeSubview 踩坑记" />
     
 
     
-    <meta name="description" content="这里是 落叶 的博客，与你一起发现更大的世界。">
-    <meta property="og:description" content="这里是 落叶 的博客，与你一起发现更大的世界。" />
-    <meta property="twitter:description" content="这里是 落叶 的博客，与你一起发现更大的世界。" />
+    <meta name="description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？">
+    <meta property="og:description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？" />
+    <meta property="twitter:description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？" />
     
 
     
@@ -34,9 +34,9 @@
     <meta name="keyword"  content="Objective C, Swift">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>Posts-落叶的博客 | LuoYe Blog</title>
+    <title>exchangeSubview 踩坑记-落叶的博客 | LuoYe Blog</title>
 
-    <link rel="canonical" href="/post/">
+    <link rel="canonical" href="/post/exchangesubview/">
 
     <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
@@ -155,14 +155,40 @@
 
 
 
-<header class="intro-header" style="background-image: url('/img/home_bg.jpeg')">
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home_bg.jpeg')
+    }
+</style>
+<header class="intro-header">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>落叶 </h1>
-                    
-		    <span class="subheading">看似飞翔，却在坠落</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/exchangesubview" title="exchangeSubview">
+                            exchangeSubview
+                        </a>
+                        
+                        <a class="tag" href="/tags/subviews" title="subviews">
+                            subviews
+                        </a>
+                        
+                        <a class="tag" href="/tags/sublayers" title="sublayers">
+                            sublayers
+                        </a>
+                        
+                    </div>
+                    <h1>exchangeSubview 踩坑记</h1>
+                    <h2 class="subheading">如何正确使用 exchangeSubview</h2>
+                    <span class="meta">
+                        2020-08-06
+                        
+                        
+                        
+                    </span>
                 </div>
             </div>
         </div>
@@ -175,13 +201,115 @@
 <article>
     <div class="container">
         <div class="row">
+
             
             <div class="
                 col-lg-8 col-lg-offset-2
                 col-md-10 col-md-offset-1
                 post-container">
 
-         	
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#踩坑">踩坑</a></li>
+<li><a href="#正解">正解</a></li>
+</ul>
+</nav>
+                
+                
+
+<h1 id="前言">前言</h1>
+
+<p>今天要讨论的是一个平常不那么常用的方法 <code>func exchangeSubview(at index1: Int, withSubviewAt index2: Int)</code> 的踩坑记。</p>
+
+<p>我们先看一下官方文档中的描述：</p>
+
+<blockquote>
+<p>Exchanges the subviews at the specified indices.</p>
+
+<p>Each index represents the position of the corresponding view in the array in the <code>subviews</code> property. Subview indices start at 0 and cannot be greater than the number of subviews. This method does not change the superview of either view but simply swaps their positions in the <code>subviews</code> array.</p>
+</blockquote>
+
+<p>简单来讲就是从一个 <code>view</code> 中交换两个 <code>subview</code> 的位置，先从 <code>subviews</code> 数组里获取两个 <code>subview</code> 的 <code>index</code> ，然后从 <code>subviews</code> 数组对象里面交换各自的位置重新渲染。从描述里我们能大概猜想到如何使用此方法，上代码：</p>
+
+<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
+view.addSubview(view1)
+
+let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
+view.addSubview(view2)
+
+/// 请忽略这里的强转，真实场景里要避免强转
+let view1Index = view.subviews.firstIndex(of: view1)!   // index为0
+let view2Index = view.subviews.firstIndex(of: view2)!   // index为1
+view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
+</code></pre>
+
+<p>在大部分场景下如上代码会按照文档里的描述一样正常工作。</p>
+
+<h1 id="踩坑">踩坑</h1>
+
+<p>但是今天我在实际使用过程当中发现并非如此，继续上代码：</p>
+
+<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
+view.addSubview(view1)
+
+let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
+view.addSubview(view2)
+
+/// 这里是新增的代码部分
+let layer1 = CALayer()
+view.layer.insertSublayer(layer1, at: 0)
+
+let view1Index = view.subviews.firstIndex(of: view1)!   // index还是为0
+let view2Index = view.subviews.firstIndex(of: view2)!   // index还是为1
+view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
+</code></pre>
+
+<p>运行代码就会发现交换的并不是预期的两个 <code>view</code> ，而是交换成一个莫名其妙不知哪里来的 <code>view</code> ，如果打印 <code>subviews</code> 发现 <code>index</code> 也是对的。那么 <code>index</code> 也是系统给的，方法也是调用的正确的，为何结果就不对了呢？</p>
+
+<p>如果重新看一下上述代码就会发现跟之前唯一的差别就是新插入了一个纯layer，问题也是出现在这里。当给一个 <code>view</code> 的 <code>layer</code> 插入一个 <code>layer</code> 的时候它会加到 <code>sublayers</code> 里面，而非 <code>subviews</code> 。也就是说如果你的 <code>view</code> 里即使用了 <code>addSubview</code> 又使用了 <code>insertSublayer</code> 的话你从 <code>subviews</code> 里面拿到的 <code>index</code> 完全是错误的。</p>
+
+<p>最关键的一点是 <code>exchangeSubview</code> 方法中交换所使用的 <code>index</code> 并非是 <code>view</code> 层级的，而是 <code>layer</code> 层级的。这一点在官方文档里面压根没提，网上资料也搜不到关于这个问题的相关解答，让我着实踩了几个小时的坑。</p>
+
+<h1 id="正解">正解</h1>
+
+<p>综上，<code>exchangeSubview</code> 方法正确的打开方式应该是这样子的：</p>
+
+<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
+view.addSubview(view1)
+
+let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
+view.addSubview(view2)
+
+let layer1 = CALayer()
+view.layer.insertSublayer(layer1, at: 0)
+
+/// 请忽略这里的强转，真实场景里要避免强转
+let view1Index = view.layer.sublayers!.firstIndex(of: view1.layer)!   // index为1
+let view2Index = view.layer.sublayers!.firstIndex(of: view2.layer)!   // index为2
+view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
+</code></pre>
+
+<p>DONE！</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/arkit3/" data-toggle="tooltip" data-placement="top" title="ARKit3 和 RealityKit 介绍">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
                 
 
 
@@ -264,7 +392,7 @@
                 <ul class="list-inline text-center">
                    
                    <li>
-                       <a href='/post/index.xml' rel="alternate" type="application/rss+xml" title="落叶" >
+                       <a href='' rel="alternate" type="application/rss+xml" title="落叶" >
                            <span class="fa-stack fa-lg">
                                <i class="fa fa-circle fa-stack-2x"></i>
                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>

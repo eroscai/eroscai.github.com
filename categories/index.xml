@@ -6,15 +6,24 @@
     <description>Recent content in Categories on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 15 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 06 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>iOS</title>
+      <link>http://caisanze.com/categories/ios/</link>
+      <pubDate>Thu, 06 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/categories/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Swift</title>
       <link>http://caisanze.com/categories/swift/</link>
-      <pubDate>Wed, 15 Jan 2020 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 06 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>http://caisanze.com/categories/swift/</guid>
       <description></description>

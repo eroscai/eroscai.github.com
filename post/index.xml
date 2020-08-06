@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 15 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 06 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>exchangeSubview 踩坑记</title>
+      <link>http://caisanze.com/post/exchangesubview/</link>
+      <pubDate>Thu, 06 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/exchangesubview/</guid>
+      <description>前言 今天要讨论的是一个平常不那么常用的方法 func exchangeSubview(at index1: Int, withSubviewAt index2: Int) 的踩坑记。 我们先看一下官方文档中的描述： Exchanges the subviews at the specified indices. Each index represents the position of the corresponding view in the array in the subviews</description>
+    </item>
     
     <item>
       <title>ARKit3 和 RealityKit 介绍</title>
