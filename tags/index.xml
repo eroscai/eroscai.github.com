@@ -6,10 +6,37 @@
     <description>Recent content in Tags on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 06 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>PHImageManager</title>
+      <link>http://caisanze.com/tags/phimagemanager/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/phimagemanager/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>requestAVAsset</title>
+      <link>http://caisanze.com/tags/requestavasset/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/requestavasset/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>requestImage</title>
+      <link>http://caisanze.com/tags/requestimage/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/requestimage/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>exchangeSubview</title>

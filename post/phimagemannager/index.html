@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="exchangeSubview 踩坑记" />
-    <meta property="og:title" content="exchangeSubview 踩坑记" />
-    <meta property="twitter:title" content="exchangeSubview 踩坑记" />
+    <meta name="title" content="PHImageManager 踩坑记" />
+    <meta property="og:title" content="PHImageManager 踩坑记" />
+    <meta property="twitter:title" content="PHImageManager 踩坑记" />
     
 
     
-    <meta name="description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？">
-    <meta property="og:description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？" />
-    <meta property="twitter:description" content="从官方文档里看 exchangeSubview 方法是用来从一个 view 中交换两个 subview 的位置，直白的讲就是从 subviews 数组里获取两个 subview 的 index，然后从 subviews 数组对象里面交换各自的位置重新渲染。但是真是如此吗？" />
+    <meta name="description" content="PHImageManager 类是 Photos 相关库里的一部分，通常是用来获取相册的本地或者iCloud里的图片和视频。最近在适配 iOS14 的发现这一块有不少旧坑和新坑，在这里简单整理一下。">
+    <meta property="og:description" content="PHImageManager 类是 Photos 相关库里的一部分，通常是用来获取相册的本地或者iCloud里的图片和视频。最近在适配 iOS14 的发现这一块有不少旧坑和新坑，在这里简单整理一下。" />
+    <meta property="twitter:description" content="PHImageManager 类是 Photos 相关库里的一部分，通常是用来获取相册的本地或者iCloud里的图片和视频。最近在适配 iOS14 的发现这一块有不少旧坑和新坑，在这里简单整理一下。" />
     
 
     
@@ -34,9 +34,9 @@
     <meta name="keyword"  content="Objective C, Swift">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>exchangeSubview 踩坑记-落叶的博客 | LuoYe Blog</title>
+    <title>PHImageManager 踩坑记-落叶的博客 | LuoYe Blog</title>
 
-    <link rel="canonical" href="/post/exchangesubview/">
+    <link rel="canonical" href="/post/phimagemannager/">
 
     <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
@@ -172,23 +172,23 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/exchangesubview" title="exchangeSubview">
-                            exchangeSubview
+                        <a class="tag" href="/tags/phimagemanager" title="PHImageManager">
+                            PHImageManager
                         </a>
                         
-                        <a class="tag" href="/tags/subviews" title="subviews">
-                            subviews
+                        <a class="tag" href="/tags/requestimage" title="requestImage">
+                            requestImage
                         </a>
                         
-                        <a class="tag" href="/tags/sublayers" title="sublayers">
-                            sublayers
+                        <a class="tag" href="/tags/requestavasset" title="requestAVAsset">
+                            requestAVAsset
                         </a>
                         
                     </div>
-                    <h1>exchangeSubview 踩坑记</h1>
-                    <h2 class="subheading">如何正确使用 exchangeSubview</h2>
+                    <h1>PHImageManager 踩坑记</h1>
+                    <h2 class="subheading">如何正确使用 requestImage 和 requestAVAsset 方法</h2>
                     <span class="meta">
-                        2020-08-06
+                        2020-09-18
                         
                         
                         
@@ -219,8 +219,9 @@
                 <nav id="TableOfContents">
 <ul>
 <li><a href="#前言">前言</a></li>
-<li><a href="#踩坑">踩坑</a></li>
-<li><a href="#正解">正解</a></li>
+<li><a href="#requestavasset-的坑">requestAVAsset 的坑</a></li>
+<li><a href="#requestimage-的坑">requestImage 的坑</a></li>
+<li><a href="#总结">总结</a></li>
 </ul>
 </nav>
                 
@@ -228,77 +229,98 @@
 
 <h1 id="前言">前言</h1>
 
-<p>今天要讨论的是一个平常不那么常用的方法 <code>func exchangeSubview(at index1: Int, withSubviewAt index2: Int)</code> 的踩坑记。</p>
-
-<p>我们先看一下官方文档中的描述：</p>
+<p>最近在APP里做相册导入功能开发的时候发现一个BUG，在iOS14系统中去导入iCloud视频时会出现导入成功拿到了视频在相册里的URL地址，但是丢到 <code>AVPlayer</code> 或者装配到 <code>AVURLAsset</code> 里使用的时候会报没有权限打开的错误：</p>
 
 <blockquote>
-<p>Exchanges the subviews at the specified indices.</p>
-
-<p>Each index represents the position of the corresponding view in the array in the <code>subviews</code> property. Subview indices start at 0 and cannot be greater than the number of subviews. This method does not change the superview of either view but simply swaps their positions in the <code>subviews</code> array.</p>
+<p>Error Domain=NSCocoaErrorDomain Code=257 &ldquo;The file &ldquo;xxx&rdquo; couldn&rsquo;t be opened because you don&rsquo;t have permission to view it.&rdquo;</p>
 </blockquote>
 
-<p>简单来讲就是从一个 <code>view</code> 中交换两个 <code>subview</code> 的位置，先从 <code>subviews</code> 数组里获取两个 <code>subview</code> 的 <code>index</code> ，然后从 <code>subviews</code> 数组对象里面交换各自的位置重新渲染。从描述里我们能大概猜想到如何使用此方法，上代码：</p>
+<p>在网络上搜寻了一番，第一个找到的答案是<a href="https://stackoverflow.com/a/50671662/2805450">这个</a>，说是获取的 <code>PHAsset</code> 姿势不对，需要使用 <code>localIdentifier</code> 去获取，然后实际去试了一番没区别。</p>
 
-<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
-view.addSubview(view1)
+<p>还有一种说法是 <code>requestAVAsset</code> 获取的地址无法使用 <code>Data(contentsOf:)</code> 这类方法访问，可以使用 <code>AVPlayer</code> 等类进行访问，但是实测的话正好相反。</p>
 
-let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
-view.addSubview(view2)
+<p>无奈之下只好开始自己摸索解决方案了，正好手上的设备可以复现问题，下面回顾一下解决过程。</p>
 
-/// 请忽略这里的强转，真实场景里要避免强转
-let view1Index = view.subviews.firstIndex(of: view1)!   // index为0
-let view2Index = view.subviews.firstIndex(of: view2)!   // index为1
-view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
+<h1 id="requestavasset-的坑">requestAVAsset 的坑</h1>
+
+<p>先看一下请求代码：</p>
+
+<pre><code class="language-swift">let requestOption = PHVideoRequestOptions()
+requestOption.isNetworkAccessAllowed = true
+requestOption.deliveryMode = .mediumQualityFormat
+PHImageManager.default().requestAVAsset(forVideo: asset, options: requestOption) {
+}
 </code></pre>
 
-<p>在大部分场景下如上代码会按照文档里的描述一样正常工作。</p>
+<p>可以注意到这里有个参数选项：</p>
 
-<h1 id="踩坑">踩坑</h1>
+<ul>
+<li><code>isNetworkAccessAllowed</code> 代表当目标是iCloud视频时可以使用网络进行实时下载。</li>
+<li><code>deliveryMode</code> 表示下载的质量，这里使用的是 <code>medium</code> 质量。</li>
+<li>还有一个未设置的默认属性 <code>version</code>，其默认值是 <code>current</code>，即返回当前版本，可能是编辑过的版本。在网上有些人貌似使用这个时也遇到无法正常返回的错误，此时可以将其设置为 <code>original</code> 版本。</li>
+</ul>
 
-<p>但是今天我在实际使用过程当中发现并非如此，继续上代码：</p>
+<p>以上参数使用上看起来没有任何问题，请求也会正常返回无错误。但是思考报错的原因的话是涉及到访问权限的，所以把返回的asset打印了出来看到如下地址：</p>
 
-<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
-view.addSubview(view1)
+<blockquote>
+<p>file:///var/mobile/Media/PhotoData/Metadata/DCIM/100APPLE/IMG_0221.medium.MP4</p>
+</blockquote>
 
-let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
-view.addSubview(view2)
+<p>此地址使用 <code>Data(contentsOf:)</code> 方法获取能正常拿到数据，但是使用 <code>AVPlayer</code> 播放就会报一开始的没有访问权限的错误。</p>
 
-/// 这里是新增的代码部分
-let layer1 = CALayer()
-view.layer.insertSublayer(layer1, at: 0)
+<p>因为本地视频是可以正常导入的，所以继续尝试获取本地已下载的视频，打印地址如下：</p>
 
-let view1Index = view.subviews.firstIndex(of: view1)!   // index还是为0
-let view2Index = view.subviews.firstIndex(of: view2)!   // index还是为1
-view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
+<blockquote>
+<p>file:///var/mobile/Media/DCIM/101APPLE/IMG_1336.MOV</p>
+</blockquote>
+
+<p>仔细观察地址会发现不正常的地址跟上面正常地址对比中间多了一些路径 <code>/PhotoData/Metadata/</code>，大概猜想这个目录是具有特殊权限才导致 <code>AVPlayer</code> 无法正常访问。</p>
+
+<p>再倒推过来如果下载下来的地址能跟本地视频保持一致是否就可以访问了呢？然后再去观察文件名发现还多了个 <code>.medium.</code> 的字样，跟我们设置的 <code>deliveryMode</code> 相对应，然后看到有个值是 <code>highQualityFormat</code> 注释写着是 <code>best quality</code> ，只能用这个去试一试了，结果一切恢复了正常。</p>
+
+<p>这个现象我开始注意到的是在X系列的设备 + iOS14系统 + iCloud视频才会出现，比较奇葩的是整个问题在我的6S设备上都不存在，尽管地址都是如上面所述的那样，但是不同设备不同系统都有着不一样的表现。</p>
+
+<p>最后只能推测这个就是苹果今年埋下的又一个焦头烂额的坑。</p>
+
+<h1 id="requestimage-的坑">requestImage 的坑</h1>
+
+<p>这个方法倒没有遇到上面 <code>requestAVAsset</code> 那样的权限问题，也有可能是没有遇到 <code>AVPlayer</code> 这样的使用场景所以没遇到，但是在使用方式上还是有挺多注意的地方。</p>
+
+<p>如果看过此方法的文档注释会发现有10几行的一大串，主要注意的部分是在 <code>PHImageRequestOptions</code> 这个类里：</p>
+
+<ul>
+<li>如果 <code>deliveryMode</code> 选的是 <code>opportunistic</code>，同时 <code>isSynchronous</code> 设置为 <code>false</code> 时 <code>resultHandler</code> 可能会被调用两次，第一次先返回一个低质量的图片，第二次返回最终正确质量的图片。当触发第一次返回时返回的信息中 <code>PHImageResultIsDegradedKey</code> 这个键对应的值会存在并且值为 <code>true</code>，可以依据这个来识别是否是低质量的图片回调。这两次返回的行为有些场景下可能会造成一些意想不到的BUG，比如你依赖这个回调进行屏幕刷新可能刷新多次，或者使用 <code>DispatchGroup</code> 来组织这个请求时如果多次触发 <code>group.leave()</code> 的话毫无疑问会产生崩溃。</li>
+<li>如果 <code>deliveryMode</code> 选的是其他，或者 <code>isSynchronous</code> 设置为 <code>true</code> 时 <code>resultHandler</code> 只会调用一次。但是如果后续修改参数时不小心忽略了上述两次返回的现象会埋下一个坑，比较稳妥的做法是不管用到哪种参数配置都在 <code>resultHandler</code> 里面进行 <code>PHImageResultIsDegradedKey</code> 的判断，确保万无一失。</li>
+<li><code>isSynchronous</code> 设置为 <code>true</code> 时是真正的同步请求，会卡住当前线程直到结束，也就是没机会进行取消，如果不想卡住线程或者需要取消操作一定记得设置 <code>false</code> 触发异步操作。</li>
+</ul>
+
+<h1 id="总结">总结</h1>
+
+<p>当前市面上的大多数APP都会跟系统的相册打交道，多数可能只是简单的写入操作，或者有读取操作也只考虑了本地已存在的部分。当考虑iCloud这部分的时候整个测试和问题排查难度就上升了好多好多，就上面 <code>requestAVAsset</code> 方法的问题就排查了好些时间，尝试了以前的所有能搜到的解决方案和相关文档都没能解决，最后只能硬着头皮去一个一个参数去尝试和调试，索性可用的参数数量不多很快就试出来了。不过可悲的是过往的这些问题可能都是出现在不同系统版本中，作为开发者的我们只能是不断的保持关注度，同时进行踩坑和总结。</p>
+
+<p>最后，由 <code>resultHandler</code> 的一个坑收尾，不管是使用 <code>requestImage</code> 还是 <code>requestAVAsset</code> 方法都会有一个回调就是 <code>resultHandler</code>。其中返回的信息中会有 <code>PHImageResultIsInCloudKey</code> 这个键类型，顾名思义就是代表是否是iCloud图片或者视频。</p>
+
+<p>但是这里要注意的是一个iCloud素材成功通过这些方法下载下来时这个键是不存在的，而由于一些限制没能从iCloud成功下载时这个键才会存在，比如没有网络，比如 <code>isNetworkAccessAllowed</code> 设为了 <code>false</code>。在没有网络这种情况下还有一个惊喜就是 <code>error</code> 为空。</p>
+
+<p>所以，会有如下蛋疼的回调处理：</p>
+
+<pre><code class="language-swift">PHImageManager.default().requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: requestOption) { (image, dict) in
+        let isDegraded = dict?[PHImageResultIsDegradedKey] as? Bool ?? false
+        /// 在highQualityFormat模式不会返回Degraded图片，这里是为了以防万一
+        /// 如果后续不小心修改了deliveryMode可能导致多次触发回调
+        if isDegraded {
+            return
+        }
+
+        let error = dict?[PHImageErrorKey] as? Error
+        let isCloud = dict?[PHImageResultIsInCloudKey] as? Bool
+        if error != nil || isCloud == true {
+            resultHandler(nil, error, dict)
+        } else {
+            resultHandler(image, nil, dict)
+        }
+}
 </code></pre>
-
-<p>运行代码就会发现交换的并不是预期的两个 <code>view</code> ，而是交换成一个莫名其妙不知哪里来的 <code>view</code> ，如果打印 <code>subviews</code> 发现 <code>index</code> 也是对的。那么 <code>index</code> 也是系统给的，方法也是调用的正确的，为何结果就不对了呢？</p>
-
-<p>如果重新看一下上述代码就会发现跟之前唯一的差别就是新插入了一个纯layer，问题也是出现在这里。当给一个 <code>view</code> 的 <code>layer</code> 插入一个 <code>layer</code> 的时候它会加到 <code>sublayers</code> 里面，而非 <code>subviews</code> 。也就是说如果你的 <code>view</code> 里即使用了 <code>addSubview</code> 又使用了 <code>insertSublayer</code> 的话你从 <code>subviews</code> 里面拿到的 <code>index</code> 完全是错误的。</p>
-
-<p>最关键的一点是 <code>exchangeSubview</code> 方法中交换所使用的 <code>index</code> 并非是 <code>view</code> 层级的，而是 <code>layer</code> 层级的。这一点在官方文档里面压根没提，网上资料也搜不到关于这个问题的相关解答，让我着实踩了几个小时的坑。</p>
-
-<h1 id="正解">正解</h1>
-
-<p>综上，<code>exchangeSubview</code> 方法正确的打开方式应该是这样子的：</p>
-
-<pre><code class="language-swift">let view1 = UIView(frame: CGRect(x: 50, y: 100, width: 200, height: 200))
-view.addSubview(view1)
-
-let view2 = UIView(frame: CGRect(x: 70, y: 120, width: 200, height: 200))
-view.addSubview(view2)
-
-let layer1 = CALayer()
-view.layer.insertSublayer(layer1, at: 0)
-
-/// 请忽略这里的强转，真实场景里要避免强转
-let view1Index = view.layer.sublayers!.firstIndex(of: view1.layer)!   // index为1
-let view2Index = view.layer.sublayers!.firstIndex(of: view2.layer)!   // index为2
-view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
-</code></pre>
-
-<p>DONE！</p>
 
 
                 
@@ -307,15 +329,10 @@ view.exchangeSubview(at: view1Index, withSubviewAt: view2Index)
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/post/arkit3/" data-toggle="tooltip" data-placement="top" title="ARKit3 和 RealityKit 介绍">&larr;
+                        <a href="/post/exchangesubview/" data-toggle="tooltip" data-placement="top" title="exchangeSubview 踩坑记">&larr;
                             Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/post/phimagemannager/" data-toggle="tooltip" data-placement="top" title="PHImageManager 踩坑记">Next
-                            Post &rarr;</a>
-                    </li>
                     
                 </ul>
 

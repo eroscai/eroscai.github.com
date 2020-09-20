@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PHImageManager on 落叶</title>
+    <link>http://caisanze.com/tags/phimagemanager/</link>
+    <description>Recent content in PHImageManager on 落叶</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://caisanze.com/tags/phimagemanager/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>PHImageManager 踩坑记</title>
+      <link>http://caisanze.com/post/phimagemannager/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/phimagemannager/</guid>
+      <description>前言 最近在APP里做相册导入功能开发的时候发现一个BUG，在iOS14系统中去导入iCloud视频时会出现导入成功拿到了视频在相册里的URL</description>
+    </item>
+    
+  </channel>
+</rss>
