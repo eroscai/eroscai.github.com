@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="落叶">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="http://caisanze.com/img/home_bg.jpeg">
+    <meta property="twitter:image" content="http://caisanze.com/img/home_bg.jpeg" />
+    
+
+    
+    <meta name="title" content="绘制不规则形状的 ShapeLayer，还可以带圆角哦" />
+    <meta property="og:title" content="绘制不规则形状的 ShapeLayer，还可以带圆角哦" />
+    <meta property="twitter:title" content="绘制不规则形状的 ShapeLayer，还可以带圆角哦" />
+    
+
+    
+    <meta name="description" content="最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加各种内外边距加圆角，还可以切换到各种比例的容器里面自适配。在这篇文章着重讲一下如何最低成本实现不规则形状的裁剪以及正确添加任何大小的圆角。">
+    <meta property="og:description" content="最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加各种内外边距加圆角，还可以切换到各种比例的容器里面自适配。在这篇文章着重讲一下如何最低成本实现不规则形状的裁剪以及正确添加任何大小的圆角。" />
+    <meta property="twitter:description" content="最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加各种内外边距加圆角，还可以切换到各种比例的容器里面自适配。在这篇文章着重讲一下如何最低成本实现不规则形状的裁剪以及正确添加任何大小的圆角。" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="Objective C, Swift">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>绘制不规则形状的 ShapeLayer，还可以带圆角哦-落叶的博客 | LuoYe Blog</title>
+
+    <link rel="canonical" href="/post/rounded-irregular-shape/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+    
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/docco.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/swift.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">落叶</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/ios">ios</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/photos">photos</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/shapelayer">shapelayer</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/swift">swift</a>
+                    </li>
+                    
+                    
+		    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home_bg.jpeg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/svg" title="svg">
+                            svg
+                        </a>
+                        
+                        <a class="tag" href="/tags/rounded" title="rounded">
+                            rounded
+                        </a>
+                        
+                        <a class="tag" href="/tags/cornerradius" title="cornerRadius">
+                            cornerRadius
+                        </a>
+                        
+                        <a class="tag" href="/tags/swift" title="swift">
+                            swift
+                        </a>
+                        
+                        <a class="tag" href="/tags/mask" title="mask">
+                            mask
+                        </a>
+                        
+                    </div>
+                    <h1>绘制不规则形状的 ShapeLayer，还可以带圆角哦</h1>
+                    <h2 class="subheading">如何绘制不规则形状的 ShapLayer，并且添加圆角到各个角落，完美实现拼图类的需求</h2>
+                    <span class="meta">
+                        2020-11-04
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#不规则形状裁剪">不规则形状裁剪</a></li>
+<li><a href="#不规则形状绘制圆角">不规则形状绘制圆角</a></li>
+<li><a href="#总结">总结</a></li>
+</ul>
+</nav>
+                
+                
+
+<h1 id="前言">前言</h1>
+
+<p>最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加各种内外边距加圆角，还可以切换到各种比例的容器里面自适配。在这篇文章着重讲一下如何最低成本实现不规则形状的裁剪以及正确添加任何大小的圆角，文末也会有封装好的 <code>View</code> 类和相关示例工程地址。</p>
+
+<h1 id="不规则形状裁剪">不规则形状裁剪</h1>
+
+<p>说到不规则形状裁剪实现肯定会涉及到 <code>UIView</code> 或者 <code>CALayer</code> 的 <code>mask</code> 属性。以 <code>UIView</code> 为举例的话 <code>mask</code> 属性需要赋值一个 <code>UIView</code> 类型的视图，系统会辨别赋值视图里的透明区域进行裁剪操作，实色部分和半透明区域可以得到展示。</p>
+
+<p>你可以传递一个带透明度的图片视图进来进行相同形状的裁剪，你也可以绘制一个 <code>UIBezierPath</code> 设置到 <code>CAShapeLayer</code> 中生成不规则形状的 <code>layer</code> 进行裁剪。比如如下代码就是给一个视图添加任一角落的圆角功能实现：</p>
+
+<pre><code class="language-swift">let roundPath = UIBezierPath(roundedRect: roundedRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: radius, height: radius))
+let maskLayer = CAShapeLayer()
+maskLayer.path = roundPath.cgPath
+layer.mask = maskLayer
+</code></pre>
+
+<p>延展开来就是你可以自行绘制任何形状的 <code>ShapeLayer</code>，然后进行裁剪操作。但是如果每一个来自设计或者产品的形状都要自行绘制那就太麻烦了，还不一定能百分百还原，那怎么办呢？</p>
+
+<p>这里就可以引入 <code>SVG</code> 这个图片格式了，先贴一段维基百科解释：</p>
+
+<blockquote>
+<p>可缩放矢量图形（英语：Scalable Vector Graphics，缩写：SVG）是一种基于可扩展标记语言（XML），用于描述二维矢量图形的图形格式。</p>
+</blockquote>
+
+<p>简单的讲用 <code>SVG</code> 格式描述的图片可以反向解析得到所有的图形信息，可以理解为把 <code>SVG</code> 图片直接解析成 <code>iOS</code> 的 <code>UIBezierPath</code> 对象也是可行的。同时 <code>SVG</code> 格式目前非常容易获取，常见的设计稿网站都自带导出任何图片为 <code>SVG</code> 格式（比如蓝湖、慕客），把 <code>SVG</code> 图片解析成 <code>UIBezierPath</code> 也有现成的开源库叫 <a href="https://github.com/pocketsvg/PocketSVG">PocketSVG</a>。</p>
+
+<p>如果只是简单的只想进行裁剪操作，那么 <code>SVG</code> 和 <code>PNG</code> 格式都能实现，两者区别只是图片大小和绘制速度不一样（ 简单形状图形上 <code>PNG</code> 通常会大很多，复杂形状图形上 <code>SVG</code> 会绘制的比较慢）。但是如果你要走到下一步，给不规则形状（三角形、N边型、斜边型、直角带波浪形等等）绘制圆角，那么肯定是只能选择 <code>SVG</code> 格式，同时还要做一些额外操作。</p>
+
+<h1 id="不规则形状绘制圆角">不规则形状绘制圆角</h1>
+
+<p>我们先重新理一下绘制不规则形状的过程：</p>
+
+<ol>
+<li>解析 <code>SVG</code> 图片，得到 <code>UIBezierPath</code> 和绘制需要的附加属性（如 <code>transform</code>，<code>fill-rule</code>，<code>opacity</code> 等等属性）。</li>
+<li>使用第一步得到的信息生成一个或多个 <code>ShapeLayer</code>，把所有的附加信息正确赋值进去。</li>
+<li>把最终的 <code>ShapeLayer</code> 添加到当前 <code>layer</code> 就得到了不规则形状的视图，然后按需使用。</li>
+</ol>
+
+<p>这里我们看一下第二步大概的实现代码：</p>
+
+<pre><code class="language-swift">let scale = CGAffineTransform(scaleX: scaledWidthRatio, y: scaledHeightRatio)
+let layerTransform = scale.concatenating(CGAffineTransform(translationX: adjustedFrame.origin.x, y: adjustedFrame.origin.y))
+for i in 0..&lt;untouchedPaths.count {
+    /// 从svg图片提取的path对象，包含附加属性
+    let path = untouchedPaths[i]
+    /// 之前用path生成的ShapeLayer
+    let layer = shapeLayers[i]
+
+    /// 从path获取附加属性一一设置到layer
+    setColor(with: path, layer: layer)
+    setFillRule(with: path, layer: layer)
+    setLineCap(with: path, layer: layer)
+    setLineJoin(with: path, layer: layer)
+    setMiterLimit(with: path, layer: layer)
+    setLineDashPattern(with: path, layer: layer)
+
+    let pathBounds = path.bounds
+    layer.frame = pathBounds.applying(layerTransform)
+    /// 处理layer的翻转问题
+    let translationTransform = CGAffineTransform(translationX: -pathBounds.origin.x,
+                                                 y: -pathBounds.origin.y)
+    let pathTransform = translationTransform.concatenating(scale)
+    path.apply(pathTransform)
+
+    /// 添加圆角的方法
+    let finalPath = addArcIfNeeded(path: path)
+    layer.path = finalPath.cgPath
+}
+</code></pre>
+
+<p>里面大部分都是常规操作就不细讲，这里展开一下最后的添加圆角的方法 <code>addArcIfNeeded(path:)</code>。</p>
+
+<p>给某个 <code>UIBezierPath</code> 添加圆角需要经过3个步骤：</p>
+
+<ol>
+<li>解析 <code>CGPath</code> 部分的 <code>point</code> 和 <code>type</code> 属性存储到数组里，两个分别是 <code>CGPoint</code> 和 <code>CGPathElementType</code> 类型。系统针对 <code>CGPath</code> 类提供了 <code>applyWithBlock</code> 方法进行便捷的遍历操作。<br /></li>
+<li>遍历此数组，辨别 <code>CGPathElementType</code> 类型进行 <code>CGPath</code> 的 <code>addLine</code>、<code>addQuadCurve</code>、<code>addCurve</code> 等操作。</li>
+
+<li><p>进行 <code>addLine</code> 操作时需要判断当前点和下一个点的索引、类型等信息，决定是进行 <code>addLine</code> 还是 <code>addArc</code> 来绘制直线或者圆角。</p>
+
+<ul>
+<li>理论上连续的两个点都是直线类型才能绘制圆角。</li>
+<li>绘制到最后一个点后需要把第一个点当做它的下一个点进行圆角绘制，形成闭环。</li>
+<li>有时候首尾的点坐标都是同一个，需要过滤一下。</li>
+<li>进行 <code>addQuadCurve</code> 和 <code>addCurve</code> 操作时因为本身就是绘制曲线类型的，所以无法简单的进行圆角的绘制，目前只是原样绘制。</li>
+<li><code>addArc</code> 操作需要一个 <code>radius</code>，这个 <code>radius</code> 如果超过一定值就会出现绘制出来的曲线变形现象。如何计算得出每一个角的这个最大半径是个数学问题，在文末的示例工程里面有一个还可以接受的计算方式。
+<br />
+<br /></li>
+</ul></li>
+</ol>
+
+<p>所以整个添加圆角方法的简化代码大概如下：</p>
+
+<pre><code class="language-swift">private func addArcIfNeeded(path: UIBezierPath) -&gt; UIBezierPath {
+    for (i, (currentPoint, type)) in pointAndTypes.enumerated() {
+        if i == 0 {
+            newPath.move(to: currentPoint)
+        } else {
+            if type == .addQuadCurveToPoint {
+                newPath.addQuadCurve(to: nextPoint, control: currentPoint)
+            } else if type == .addCurveToPoint {
+                newPath.addCurve(to: nextNextPoint, control1: currentPoint, control2: nextPoint)
+            } else {
+                if allowAddArc(type: type), allowAddArc(type: nextType) {
+                    addArcForRadius(path: newPath,
+                                    prePoint: prePoint,
+                                    tangent1End: currentPoint,
+                                    tangent2End: nextPoint,
+                                    radius: scaledRadius)
+                } else {
+                    newPath.addLine(to: currentPoint)
+                }
+            }
+
+            if i == totalCount - 1 {
+                if allowAddArc(type: firstType), allowAddArc(type: secondType) {
+                    addArcForRadius(path: newPath,
+                                    prePoint: prePoint,
+                                    tangent1End: firstPoint,
+                                    tangent2End: secondPoint,
+                                    radius: scaledRadius)
+                }
+            }
+        }
+    }
+
+    return UIBezierPath(cgPath: newPath)
+}
+</code></pre>
+
+<h1 id="总结">总结</h1>
+
+<p>至此就能完整实现不规则形状的裁剪和绘制圆角功能。其中重头戏在于画圆角这一块，涉及到拆分 <code>path</code> 信息、重组 <code>path</code> 信息、计算每个角的最大 <code>radius</code> 、处理各种边界情况等等。</p>
+
+<p>这里封装了一个视图同时整理了DEMO工程 <a href="https://github.com/eroscai/ATSVGImageView">ATSVGImageView</a> ，想看细节实现的可以去查看对应代码 。如何计算出每个角最大圆角是个比较头疼的问题，里面虽然整理了一种计算方式，但不尽完美，如果有人知道比较好的方式欢迎留言或者提交PR。</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/phimagemannager/" data-toggle="tooltip" data-placement="top" title="PHImageManager 踩坑记">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+                
+
+
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"/>
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+    const gitalk = new Gitalk({
+        clientID: '707fab9a3b3e200c57b1',
+        clientSecret: '6bf3cf75ae3a18ac46eb5138042babcad67191b1',
+        repo: 'BlogComment',
+        owner: 'eroscai',
+        admin: ['eroscai'],
+        id: decodeURI(location.pathname), 
+        distractionFreeMode: false 
+    });
+    (function () {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML =
+                'Gitalk comments not available by default when the website is previewed locally.';
+            return;
+        }
+        gitalk.render('gitalk-container');
+    })();
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/swift" title="swift">
+                            swift
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href='' rel="alternate" type="application/rss+xml" title="落叶" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:csz0102@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/eroscai">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 落叶 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-178396830-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>cornerRadius on 落叶</title>
+    <link>http://caisanze.com/tags/cornerradius/</link>
+    <description>Recent content in cornerRadius on 落叶</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Nov 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://caisanze.com/tags/cornerradius/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>绘制不规则形状的 ShapeLayer，还可以带圆角哦</title>
+      <link>http://caisanze.com/post/rounded-irregular-shape/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/rounded-irregular-shape/</guid>
+      <description>前言 最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加</description>
+    </item>
+    
+  </channel>
+</rss>

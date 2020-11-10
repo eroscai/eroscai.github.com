@@ -6,10 +6,19 @@
     <description>Recent content in Swift on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 04 Nov 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/categories/swift/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>绘制不规则形状的 ShapeLayer，还可以带圆角哦</title>
+      <link>http://caisanze.com/post/rounded-irregular-shape/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/rounded-irregular-shape/</guid>
+      <description>前言 最近在做拼图（Collage）类的需求，拼图功能简单讲就是把1~N张图片按照各种形状裁剪然后拼起来，形状有规则的也有不规则的，还可以添加</description>
+    </item>
     
     <item>
       <title>PHImageManager 踩坑记</title>

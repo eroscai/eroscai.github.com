@@ -6,10 +6,55 @@
     <description>Recent content in Tags on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 04 Nov 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>cornerRadius</title>
+      <link>http://caisanze.com/tags/cornerradius/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/cornerradius/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>mask</title>
+      <link>http://caisanze.com/tags/mask/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/mask/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rounded</title>
+      <link>http://caisanze.com/tags/rounded/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/rounded/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>svg</title>
+      <link>http://caisanze.com/tags/svg/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/svg/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>swift</title>
+      <link>http://caisanze.com/tags/swift/</link>
+      <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/swift/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>PHImageManager</title>
@@ -107,15 +152,6 @@
       <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>http://caisanze.com/tags/avplayeritemvideooutput/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Swift</title>
-      <link>http://caisanze.com/tags/swift/</link>
-      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>http://caisanze.com/tags/swift/</guid>
       <description></description>
     </item>
     
