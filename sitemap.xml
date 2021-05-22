@@ -4,7 +4,57 @@
   
   <url>
     <loc>http://caisanze.com/categories/</loc>
-    <lastmod>2020-11-04T00:00:00+00:00</lastmod>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/tags/fsck_hfs/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/tags/hdiutil/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/categories/mac/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/post/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/tags/recover/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/tags/sparsebundle/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/tags/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/categories/timemachine/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/post/recover-data-from-sparsebundle/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://caisanze.com/</loc>
+    <lastmod>2021-05-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -19,11 +69,6 @@
   
   <url>
     <loc>http://caisanze.com/tags/mask/</loc>
-    <lastmod>2020-11-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://caisanze.com/post/</loc>
     <lastmod>2020-11-04T00:00:00+00:00</lastmod>
   </url>
   
@@ -43,27 +88,17 @@
   </url>
   
   <url>
-    <loc>http://caisanze.com/categories/swift/</loc>
-    <lastmod>2020-11-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://caisanze.com/tags/swift/</loc>
     <lastmod>2020-11-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://caisanze.com/tags/</loc>
+    <loc>http://caisanze.com/categories/swift/</loc>
     <lastmod>2020-11-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>http://caisanze.com/post/rounded-irregular-shape/</loc>
-    <lastmod>2020-11-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://caisanze.com/</loc>
     <lastmod>2020-11-04T00:00:00+00:00</lastmod>
   </url>
   

@@ -6,10 +6,46 @@
     <description>Recent content in Tags on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 04 Nov 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 21 May 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>fsck_hfs</title>
+      <link>http://caisanze.com/tags/fsck_hfs/</link>
+      <pubDate>Fri, 21 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/fsck_hfs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>hdiutil</title>
+      <link>http://caisanze.com/tags/hdiutil/</link>
+      <pubDate>Fri, 21 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/hdiutil/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>recover</title>
+      <link>http://caisanze.com/tags/recover/</link>
+      <pubDate>Fri, 21 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/recover/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>sparsebundle</title>
+      <link>http://caisanze.com/tags/sparsebundle/</link>
+      <pubDate>Fri, 21 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/tags/sparsebundle/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>cornerRadius</title>
@@ -48,7 +84,7 @@
     </item>
     
     <item>
-      <title>swift</title>
+      <title>Swift</title>
       <link>http://caisanze.com/tags/swift/</link>
       <pubDate>Wed, 04 Nov 2020 00:00:00 +0000</pubDate>
       

@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 落叶</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 04 Nov 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 21 May 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://caisanze.com/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>从损坏的TimeMachine备份（.sparsebundle）中恢复数据</title>
+      <link>http://caisanze.com/post/recover-data-from-sparsebundle/</link>
+      <pubDate>Fri, 21 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://caisanze.com/post/recover-data-from-sparsebundle/</guid>
+      <description>前言 最近用了4年的MBP的主板突然嗝屁了，大概可能应该是因为使用的第三方电源突然坏了。更惨的是遇上了苹果TimeMachine的备份缺陷/B</description>
+    </item>
     
     <item>
       <title>绘制不规则形状的 ShapeLayer，还可以带圆角哦</title>

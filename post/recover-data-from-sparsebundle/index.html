@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="落叶">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="http://caisanze.com/img/home_bg.jpeg">
+    <meta property="twitter:image" content="http://caisanze.com/img/home_bg.jpeg" />
+    
+
+    
+    <meta name="title" content="从损坏的TimeMachine备份（.sparsebundle）中恢复数据" />
+    <meta property="og:title" content="从损坏的TimeMachine备份（.sparsebundle）中恢复数据" />
+    <meta property="twitter:title" content="从损坏的TimeMachine备份（.sparsebundle）中恢复数据" />
+    
+
+    
+    <meta name="description" content="最近因为换主板 &#43; 苹果的TimeMachine备份缺陷/Bug导致无法正常恢复大部分数据，包括所有文档和大部分APP数据。经过大概一个星期的折腾终于把所有重要数据恢复了过来，这里把过程中踩到的坑一一列出来，希望遇到同样问题的时候能给到一些帮助。">
+    <meta property="og:description" content="最近因为换主板 &#43; 苹果的TimeMachine备份缺陷/Bug导致无法正常恢复大部分数据，包括所有文档和大部分APP数据。经过大概一个星期的折腾终于把所有重要数据恢复了过来，这里把过程中踩到的坑一一列出来，希望遇到同样问题的时候能给到一些帮助。" />
+    <meta property="twitter:description" content="最近因为换主板 &#43; 苹果的TimeMachine备份缺陷/Bug导致无法正常恢复大部分数据，包括所有文档和大部分APP数据。经过大概一个星期的折腾终于把所有重要数据恢复了过来，这里把过程中踩到的坑一一列出来，希望遇到同样问题的时候能给到一些帮助。" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="Objective C, Swift">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>从损坏的TimeMachine备份（.sparsebundle）中恢复数据-落叶的博客 | LuoYe Blog</title>
+
+    <link rel="canonical" href="/post/recover-data-from-sparsebundle/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+    
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/docco.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/swift.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">落叶</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/ios">ios</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/mac">mac</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/photos">photos</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/shapelayer">shapelayer</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/swift">swift</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/timemachine">timemachine</a>
+                    </li>
+                    
+                    
+		    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home_bg.jpeg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/sparsebundle" title="sparsebundle">
+                            sparsebundle
+                        </a>
+                        
+                        <a class="tag" href="/tags/hdiutil" title="hdiutil">
+                            hdiutil
+                        </a>
+                        
+                        <a class="tag" href="/tags/fsck_hfs" title="fsck_hfs">
+                            fsck_hfs
+                        </a>
+                        
+                        <a class="tag" href="/tags/recover" title="recover">
+                            recover
+                        </a>
+                        
+                    </div>
+                    <h1>从损坏的TimeMachine备份（.sparsebundle）中恢复数据</h1>
+                    <h2 class="subheading">一步一步讲解如何从损坏的TimeMachine备份中尽可能的修复和恢复数据</h2>
+                    <span class="meta">
+                        2021-05-21
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#开始前准备">开始前准备</a></li>
+<li><a href="#准备备份包">准备备份包</a></li>
+<li><a href="#修复">修复</a>
+<ul>
+<li><a href="#修改访问权限">修改访问权限</a></li>
+<li><a href="#装载-sparsebundle">装载 <code>.sparsebundle</code></a></li>
+<li><a href="#重整文件系统">重整文件系统</a></li>
+<li><a href="#正式修复">正式修复</a></li>
+<li><a href="#修改配置">修改配置</a></li>
+</ul></li>
+<li><a href="#恢复">恢复</a></li>
+<li><a href="#总结">总结</a></li>
+</ul>
+</nav>
+                
+                
+
+<h1 id="前言">前言</h1>
+
+<p>最近用了4年的MBP的主板突然嗝屁了，大概可能应该是因为使用的第三方电源突然坏了。更惨的是遇上了苹果TimeMachine的备份缺陷/Bug导致几乎所有重要数据都无法恢复，300G的备份中恢复的系统只有几十G的数据，整个Documents文件夹是空空的，包括图片文件夹也是缺失很多数据。
+在经历了一个星期的不断爬坑、尝试、重装N次系统等过程后最终找回了我想要找回的大部分数据，这篇文章把相关过程和经验简单整理一下，希望遇到同样问题的时候能给到一些帮助。</p>
+
+<h1 id="开始前准备">开始前准备</h1>
+
+<p>这篇文章里讨论的所有操作都是基于你手上有TimeMachine功能所生成的备份包，大部分系统上都是用 <code>.sparsebundle</code> 后缀来进行存储的，不管是备份到移动硬盘还是NAS上都会有这个包，先把这个备份包找出来。</p>
+
+<p>在正式开始尝试恢复之前有几个注意点需要罗列一下：</p>
+
+<ol>
+<li>不要盲目的去点击重新备份这个选项，甚至是覆盖原有备份等操作。网上有一类解决方案提到当发现丢失一些文件或文件夹后可以先在TimeMachine设置中进行过滤这些文件 -&gt; 进行新的备份 -&gt; 取消过滤操作 -&gt; 再进行新的备份方式来触发恢复操作。我自己的血的教训就是原先300G的备份包经过这个操作后变成了180G左右，应该是彻底丢失了那些想要的数据。但是这个操作肯定也是能适用于一些场景的，如果想尝试可以先把原始备份包复制一份出来再尝试。</li>
+<li>任何的修复、恢复、重新备份等操作前一定要确保，确保，确保永远都存在着一份原始备份包，以免各类操作导致原始备份包彻底变成垃圾。</li>
+<li>可以考虑使用容量大一点的移动硬盘（1T及以上）来把备份包拷贝出来进行各类修复、恢复等操作。因为一般备份包都是几百G以上的大小，各类操作都是几个小时起步，基于稳定的物理连接进行各类操作还是有必要的，如果想通过WIFI来进行数据传输和修复那这个耗时可能是按天来算了。</li>
+<li>进行任何操作时尽可能的把设备放在不容易动到的地方，以免误触导致断开链接，可能N个小时的操作需要从头再来。</li>
+<li>恢复目标不要设定成完整的系统级别的恢复，我自己实际尝试结果来看的话几乎是不可能恢复100%。可以把目标设定成我只需要恢复重要的Documtents、重要的图片、重要的其他文件等，剩下的系统的东西我完全可以重新配置，一旦恢复到一些数据后一定要及时拷贝出来。</li>
+</ol>
+
+<blockquote>
+<p>如果你觉得你的备份包损坏不严重，同时只是需要其中的一小部分文档，可以直接跳到最后的 <a href="#恢复">恢复</a> 那一节先进行尝试，如果失败责回到第一步重新开始。</p>
+</blockquote>
+
+<h1 id="准备备份包">准备备份包</h1>
+
+<p>苹果的TimeMachine备份包有两种后缀，分别是 <code>.sparsebundle</code> 和 <code>.backupbundle</code>。<code>.backupbundle</code> 后缀是在 <code>Catalina OS</code> 中临时引入的，目前的系统中又恢复成了 <code>.sparsebundle</code>，这一系列骚操作应该也是导致各种数据丢失的原因之一。同时我也发现苹果的不同系统之间（ <code>Big sur</code> 和 <code>Catalina</code> 或更早的系统）的备份包是无法100%互通的，比如你的最新备份是在 <code>Big Sur</code> 里面生成的，你想恢复数据最好是先把系统升级上来再用迁移助手进行恢复，在其他版本系统里是无法识别这个备份包的，这时候千万不要误认为这个备份包已经损坏而进行删除。</p>
+
+<p>苹果还有一个骚操作就是有时会生成 <code>.purgeable.sparsebundle</code>，名称上也可以想到这个是废弃的备份包，产生的时机是苹果的TimeMachine提示原有备份已损坏是否要生成一个新备份时你点击了确认按钮，大概长这样：</p>
+
+<p><img src="/images/recover-data-new-backup.png" alt="开始新备份" /></p>
+
+<p>这个包代表着苹果自己的问题或者用户使用异常导致备份包部分损坏，无法直接使用于TimeMachine功能中。但是不代表一无用处，我自己的话就是从这个垃圾备份包中恢复了我所有的重要数据（因为原始的那个300G备份包之前被一系列骚操作彻底变垃圾了）。</p>
+
+<p>所以你需要准备的是 <code>.sparsebundle</code> 或 <code>.purgeable.sparsebundle</code> 两者其一，然后将其复制到移动硬盘中。</p>
+
+<blockquote>
+<p>注意移动硬盘里面除了备份包以外不要放其他文件或者文件夹，混搭的时候发现有时候苹果会无法正常挂载</p>
+</blockquote>
+
+<h1 id="修复">修复</h1>
+
+<p>修复过程网上搜一搜的话大体都差不多，主要有如下过程：</p>
+
+<h2 id="修改访问权限">修改访问权限</h2>
+
+<p>每次重新挂载以后都需要进行一下权限更改，以免在修复过程中出现访问权限问题，此过程不会耗时太久，顶多几分钟就结束。</p>
+
+<pre><code>chflags -R nouchg &quot;/Volumes/&lt;TM backup name&gt;/&lt;mybackupname&gt;.sparsebundle&quot;
+</code></pre>
+
+<h2 id="装载-sparsebundle">装载 <code>.sparsebundle</code></h2>
+
+<p>装载命令如下：</p>
+
+<pre><code>hdiutil attach -nomount -readwrite -noverify -noautofsck &quot;/Volumes/&lt;TM backup name&gt;/&lt;mybackupname&gt;.sparsebundle&quot;
+</code></pre>
+
+<p>成功后将会打印出这类信息：</p>
+
+<pre><code>/dev/disk5 GUID_partition_scheme
+/dev/disk5s1 EFI
+/dev/disk5s2 Apple_HFS     &lt;Your Volume name&gt;
+</code></pre>
+
+<p>这里面有用的是第三行盘符，格式标记为 <code>Apple_HFS</code>，也就是备份包里面主要存储内容的地方，记住这个盘符名称 <code>/dev/disk5s2</code>，里面的 <code>disk5s2</code> 中数字5是每次装载的时候都有可能在变的。</p>
+
+<h2 id="重整文件系统">重整文件系统</h2>
+
+<pre><code>//           -p      Preen the specified file systems.
+
+fsck_hfs -p /dev/disk5s2
+</code></pre>
+
+<p>网上的有些方案中没有这一步，但是针对有损坏的备份包的话最好还是执行这一步。实际执行过程中可以观察到这一步是在不断循环的检测，修复大小错误，修复索引错误，会一直循环到没有发现问题为止。我自己的 <code>.purgeable.sparsebundle</code> 大小是700G左右，完整执行完这个命令大概花了7，8个小时，也是整个过程中耗时最长的一段。</p>
+
+<p>因为耗时比较长，一定要保证过程中不会出现中断行为，一旦中断了有可能要从头再来。除了连接不稳定以外通常遇到的问题是访问权限问题，每次重新装载时都进行第一步的权限更改即可。</p>
+
+<h2 id="正式修复">正式修复</h2>
+
+<pre><code>//           -d      Display debugging information.  This option may provide useful information when fsck_hfs cannot repair a damaged file system.
+//           -r      Rebuild the catalog btree.  This is synonymous with -Rc.
+//           -f      When used with the -p option, force fsck_hfs to check `clean` file systems, otherwise it means force fsck_hfs to check and repair journaled HFS+ file systems.
+//           -y      Always attempt to repair any damage that is found.
+
+fsck_hfs -drfy /dev/diskxs2
+</code></pre>
+
+<p>上一步重整文件系统步骤执行完以后这一步会执行的更快一些，实际执行的话也会循环的修复到没有发现问题为止，完整执行完这个命令大概花了1，2个小时。</p>
+
+<p>如果一切顺利的话最终会自动结束并打印出修复成功等字样，接下来就可以修改备份包里的配置文件，把它标记为可用状态。</p>
+
+<h2 id="修改配置">修改配置</h2>
+
+<p>每个备份包里面都会有几个配置文件，其中我们需要修改的是 <code>com.apple.TimeMachine.MachineID.plist</code> ，文件位置如下：</p>
+
+<pre><code>/Volumes/&lt;TM backup name&gt;/&lt;mybackupname&gt;.sparsebundle/com.apple.TimeMachine.MachineID.plist
+</code></pre>
+
+<p>可以使用 <code>vi</code> 命令或者直接使用文本编辑器找到如下地方并修改：</p>
+
+<pre><code>&lt;key&gt;VerificationState&lt;/key&gt;
+&lt;integer&gt;0&lt;/integer&gt;
+</code></pre>
+
+<p>这样整个修复过程都结束，但是现不要着急拿着去恢复系统，先继续看下节 <a href="#恢复">恢复</a>。</p>
+
+<h1 id="恢复">恢复</h1>
+
+<p>在恢复这个过程中我自己着实走了非常多的误区，因为网络上搜到的所有恢复方案无非就是两种，一个是使用迁移助手来恢复数据或者系统，一个是从TimeMachine菜单中进入时间机器然后从酷炫的文档界面中选择以前的日期进行恢复。</p>
+
+<p>实测中会发现要么迁移助手里面识别不到备份，要么是时间机器中压根没有以前日期可选。这直接导致不断怀疑备份包是否还是有问题，但实际上有更直接的方式可以从备份包中获取数据。</p>
+
+<pre><code>// 装载正常的TimeMachine的.sparsebundle
+hdiutil attach /Volumes/&lt;TM backup name&gt;/&lt;mybackupname&gt;.sparsebundle -readonly
+</code></pre>
+
+<p>然后就可以在终端或者Finder中直接访问到装载的备份包（在Finder中的话会显示在左侧中间 <code>位置</code> 那一块，就像挂载的移动硬盘一样，针对备份包可以右键显示包内容来查看里面内容），不断剥开文件夹，层层进入到里面就会发现备份包里的数据都按照之前备份过的日期为名称一个个的躺在那里，你需要的做的就是进入到需要的文件夹进行需要的拷贝。</p>
+
+<p>我想不明白为什么苹果的时间机器恢复界面做的那么酷炫那么难用，却只字不提如此简单便捷的操作方式，可能是这个操作太简单了当做所有人都能自己意识到？</p>
+
+<h1 id="总结">总结</h1>
+
+<p>至此整个过程都已结束，你可能意识到为什么没有重装系统的部分呢？我自己的踩坑经历来看不管如何修复有问题的备份包也无法做到系统的完全还原，我尝试了3-4次的重装系统，也尝试了不同系统版本的恢复（因为我的备份包里面分别有Catalina和Big Sur的备份），虽然最终恢复过程会走完，但是系统启动时会遇到各类缺失项的问题。</p>
+
+<p>实际上我觉得也不需要系统的完全还原，因为重要的是我们的文档数据，配置类的东西还是可以花点时间重新弄一遍，相比于重装系统上所浪费的时间和精力来说这点时间不算什么。</p>
+
+<p>这一次还得到的一个教训就是不要太相信或者太确信一些事情，比如这次的过于相信苹果的TimeMachine功能而完全忽视可能的其他备份方案。如果不是从最后的一线希望 <code>.purgeable.sparsebundle</code> 中恢复到了数据，那就是直接导致我这些积累的重要文档全部丢失。</p>
+
+<p>最后再总结一下在TimeMachine使用过程中应该注意的点：</p>
+
+<ol>
+<li>每次开始备份尽量让这个过程跑完，不要频繁的去中断它，这可能会加大文档丢失的可能性</li>
+<li>跨系统版本的备份恢复通常兼容性很差，在不同系统中初次备份时尽可能确保之前的备份有拷贝出来，这样在出现异常的时候还可以恢复到旧备份中</li>
+<li>在TimeMachine容量设定的不够大时可以考虑关闭自动备份，改成手动触发加上固定周期去备份，因为容量不够大同时每次需要同步的内容比较大时经常出现备份失败的情况</li>
+<li>当出现系统提示以前的备份出现损坏的时候及时把当前的备份包以及重要数据拷贝出来，以免后患</li>
+<li>重要的数据多一份备份方案永远是值得的</li>
+</ol>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/rounded-irregular-shape/" data-toggle="tooltip" data-placement="top" title="绘制不规则形状的 ShapeLayer，还可以带圆角哦">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+                
+
+
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"/>
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+<script>
+    const gitalk = new Gitalk({
+        clientID: '707fab9a3b3e200c57b1',
+        clientSecret: '6bf3cf75ae3a18ac46eb5138042babcad67191b1',
+        repo: 'BlogComment',
+        owner: 'eroscai',
+        admin: ['eroscai'],
+        id: decodeURI(location.pathname), 
+        distractionFreeMode: false 
+    });
+    (function () {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('gitalk-container').innerHTML =
+                'Gitalk comments not available by default when the website is previewed locally.';
+            return;
+        }
+        gitalk.render('gitalk-container');
+    })();
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/swift" title="swift">
+                            swift
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href='' rel="alternate" type="application/rss+xml" title="落叶" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:csz0102@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/eroscai">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 落叶 2021
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-178396830-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
